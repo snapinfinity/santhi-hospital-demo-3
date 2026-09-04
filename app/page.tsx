@@ -1,38 +1,39 @@
 import { Hero } from "@/components/sections/hero";
-import { QuickAccess } from "@/components/sections/quick-access";
 import { About } from "@/components/sections/about";
 import { Departments } from "@/components/sections/departments";
 import { Doctors } from "@/components/sections/doctors";
-import { PatientJourney } from "@/components/sections/patient-journey";
+import { Journey } from "@/components/sections/journey";
 import { Services } from "@/components/sections/services";
+import { Packages } from "@/components/sections/packages";
 import { Facilities } from "@/components/sections/facilities";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Emergency } from "@/components/sections/emergency";
 import { Insights } from "@/components/sections/insights";
-import { AppointmentCta } from "@/components/sections/appointment-cta";
+import { Cta } from "@/components/sections/cta";
 import { Faq } from "@/components/sections/faq";
 import { Contact } from "@/components/sections/contact";
 
 /**
  * The homepage is a server component. Only the pieces that need browser state —
- * the header's menu, the department index, the booking flow and the reveal
- * wrappers — cross into the client.
+ * the header's menu and scroll state, the scroll progress bar, the department
+ * explorer, the doctor roster, the testimonial carousel, the FAQ accordion and
+ * the booking flow — cross into the client.
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <QuickAccess />
       <About />
       <Departments />
       <Doctors />
-      <PatientJourney />
+      <Journey />
       <Services />
+      <Packages />
       <Facilities />
       <Testimonials />
       <Emergency />
       <Insights />
-      <AppointmentCta />
+      <Cta />
       <Faq />
       <Contact />
     </>

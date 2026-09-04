@@ -1,108 +1,114 @@
-import Link from "next/link";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { BookButton } from "@/components/appointment/book-button";
-import { hospital } from "@/data/site";
-
-const columns = [
-  {
-    heading: "Hospital",
-    links: [
-      { label: "About", href: "#about" },
-      { label: "Doctors", href: "#doctors" },
-      { label: "Departments", href: "#departments" },
-      { label: "Facilities", href: "#facilities" },
-    ],
-  },
-  {
-    heading: "Patient care",
-    links: [
-      { label: "Services", href: "#services" },
-      { label: "Emergency", href: "#emergency" },
-      { label: "Health insights", href: "#insights" },
-      { label: "Contact", href: "#contact" },
-    ],
-  },
-  {
-    heading: "Resources",
-    links: [
-      { label: "Frequently asked questions", href: "#faq" },
-      { label: "Opening hours", href: "#contact" },
-      { label: "Visiting hours", href: "#faq" },
-      { label: "Back to top", href: "#top" },
-    ],
-  },
-];
+import { hospital, navigation } from "@/data/site";
+import { departments } from "@/data/departments";
 
 export function SiteFooter() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="on-dark bg-ink pt-14 pb-7 text-white lg:pt-16">
-      <div className="mx-auto max-w-[88rem] px-5 lg:px-10">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-4">
-            {/* The supplied mark has an opaque light background, so on a dark
-                ground it is given a plate rather than being altered. */}
-            <Logo variant="plate" width={140} />
-            <p className="mt-5 max-w-[34ch] text-ink-muted">
-              A multi-speciality hospital serving Kottayam and the surrounding districts since 1991.
+    <footer className="on-dark relative overflow-hidden bg-ink text-white">
+      <div aria-hidden="true" className="ribbon-sweep h-1 w-full" />
+
+      <div className="mx-auto max-w-7xl px-4 pt-16 pb-10 sm:px-6">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+          <div className="flex flex-col gap-5">
+            <Logo tone="dark" />
+            <p className="max-w-[38ch] text-[0.95rem] leading-relaxed text-ink-muted">
+              {hospital.tagline} A multi-speciality hospital for Kozhikode and the Malabar
+              coast, caring since 1992.
             </p>
-            <div className="mt-5">
-              <BookButton variant="onDark">Book an Appointment</BookButton>
-            </div>
+            <BookButton variant="onDark" className="w-fit">
+              Book an appointment
+            </BookButton>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-3 lg:col-span-5 lg:col-start-6">
-            {columns.map((column) => (
-              <nav key={column.heading} aria-label={column.heading}>
-                <h2 className="label-sm text-white/55">{column.heading}</h2>
-                <ul className="mt-3 flex flex-col">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="inline-block py-1.5 text-[0.9375rem] text-ink-muted transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
-          </div>
+          <nav aria-label="Footer — departments">
+            <h2 className="label-sm mb-4 text-teal">Departments</h2>
+            <ul className="flex flex-col gap-2.5">
+              {departments.slice(0, 6).map((department) => (
+                <li key={department.id}>
+                  <a
+                    href="#departments"
+                    className="text-[0.95rem] text-ink-muted transition-colors hover:text-white"
+                  >
+                    {department.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          <div className="lg:col-span-3">
-            <h2 className="label-sm text-white/55">Reach us</h2>
-            <ul className="mt-3 flex flex-col gap-2 text-[0.9375rem]">
+          <nav aria-label="Footer — hospital">
+            <h2 className="label-sm mb-4 text-teal">Hospital</h2>
+            <ul className="flex flex-col gap-2.5">
+              {navigation.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className="text-[0.95rem] text-ink-muted transition-colors hover:text-white"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
               <li>
-                <span className="block text-ink-muted">General</span>
-                <a href={hospital.phone.generalHref} className="tabular inline-block py-0.5 hover:text-teal">
-                  {hospital.phone.general}
-                </a>
-              </li>
-              <li>
-                <span className="block text-ink-muted">Emergency, 24 hours</span>
-                <a href={hospital.phone.emergencyHref} className="tabular inline-block py-0.5 hover:text-teal">
-                  {hospital.phone.emergency}
-                </a>
-              </li>
-              <li>
-                <span className="block text-ink-muted">Email</span>
-                <a href={`mailto:${hospital.email}`} className="inline-block py-0.5 break-all hover:text-teal">
-                  {hospital.email}
+                <a href="#emergency" className="text-[0.95rem] text-ink-muted transition-colors hover:text-white">
+                  Emergency care
                 </a>
               </li>
             </ul>
+          </nav>
+
+          <div>
+            <h2 className="label-sm mb-4 text-teal">Visit us</h2>
+            <address className="flex flex-col gap-4 text-[0.95rem] not-italic text-ink-muted">
+              <p className="flex items-start gap-3">
+                <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-teal" />
+                <span>
+                  {hospital.address.street}, {hospital.address.locality}
+                  <br />
+                  {hospital.address.region} {hospital.address.postalCode}
+                </span>
+              </p>
+              <p className="flex items-center gap-3">
+                <Phone aria-hidden="true" className="size-4 shrink-0 text-teal" />
+                <a href={hospital.phone.generalHref} className="tabular transition-colors hover:text-white">
+                  {hospital.phone.general}
+                </a>
+              </p>
+              <p className="flex items-center gap-3">
+                <Mail aria-hidden="true" className="size-4 shrink-0 text-teal" />
+                <a href={`mailto:${hospital.email}`} className="break-all transition-colors hover:text-white">
+                  {hospital.email}
+                </a>
+              </p>
+            </address>
+            <p className="mt-5 border-t border-white/10 pt-4 text-[0.85rem] text-ink-muted">
+              Emergency &amp; ambulance, 24 hours:{" "}
+              <a href={hospital.phone.emergencyHref} className="tabular font-medium text-white">
+                {hospital.phone.emergency}
+              </a>
+            </p>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-white/15 pt-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Santhi Hospital. All rights reserved.</p>
-          <p className="max-w-[64ch]">
-            Design prototype. Every doctor, statistic, testimonial, address and telephone number on
-            this site is fictional demonstration content.
+        <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 text-[0.8rem] text-ink-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>© {year} Santhi Hospital, Kozhikode. Demonstration website.</p>
+          <p className="max-w-[62ch]">
+            Every consultant, statistic, testimonial and price on this page is fictional, invented
+            for a design demo.
           </p>
         </div>
       </div>
+
+      <p
+        aria-hidden="true"
+        className="pointer-events-none relative -mt-4 mb-[-0.16em] w-full overflow-hidden text-center font-display text-mega font-semibold text-white/[0.045] select-none"
+      >
+        Santhi
+      </p>
     </footer>
   );
 }

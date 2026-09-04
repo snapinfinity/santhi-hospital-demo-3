@@ -12,11 +12,21 @@ export type Article = {
 
 export const articles: Article[] = [
   {
+    id: "monsoon-fever",
+    title: "Monsoon fevers in Kozhikode: when to wait, and when to walk in",
+    category: "General Medicine",
+    date: "29 August 2026",
+    dateTime: "2026-08-29",
+    readingMinutes: 6,
+    excerpt:
+      "Every June the same question arrives with the rain. A physician explains which fevers settle at home, which need a test on day three, and the signs that should never wait.",
+  },
+  {
     id: "healthier-heart",
     title: "Five habits that do more for your heart than any supplement",
     category: "Cardiology",
-    date: "28 August 2026",
-    dateTime: "2026-08-28",
+    date: "21 August 2026",
+    dateTime: "2026-08-21",
     readingMinutes: 6,
     excerpt:
       "Sleep, salt, movement, smoking and stress. None of them are new advice, which is exactly why they get skipped over — here is what each one actually changes.",
@@ -25,50 +35,40 @@ export const articles: Article[] = [
     id: "preventive-checkups",
     title: "What a preventive health check should and should not include",
     category: "Preventive Health",
-    date: "19 August 2026",
-    dateTime: "2026-08-19",
+    date: "14 August 2026",
+    dateTime: "2026-08-14",
     readingMinutes: 5,
     excerpt:
       "More tests is not the same as better screening. A guide to reading a package, and the questions worth asking before you book one.",
   },
   {
-    id: "orthopaedic-specialist",
+    id: "knee-pain",
     title: "When knee pain needs a specialist, and when it needs patience",
     category: "Orthopaedics",
-    date: "11 August 2026",
-    dateTime: "2026-08-11",
+    date: "6 August 2026",
+    dateTime: "2026-08-06",
     readingMinutes: 7,
     excerpt:
       "Most joint pain settles without surgery. These are the specific signs that mean it is time to stop waiting and get it looked at.",
   },
   {
-    id: "seasonal-illness",
-    title: "Supporting a child through the monsoon illness season",
+    id: "child-asthma",
+    title: "A parent's guide to childhood asthma during the school year",
     category: "Paediatrics",
-    date: "2 August 2026",
-    dateTime: "2026-08-02",
+    date: "28 July 2026",
+    dateTime: "2026-07-28",
     readingMinutes: 5,
     excerpt:
-      "Fever is a symptom, not a diagnosis. How to judge what can be managed at home, and the thresholds that should bring you in.",
+      "The inhaler is the easy part. What actually keeps children out of the emergency room is a written plan their teacher, coach and grandparent can all follow.",
   },
   {
-    id: "regular-screening",
-    title: "Screening after 40: a decade-by-decade guide",
-    category: "General Medicine",
-    date: "24 July 2026",
-    dateTime: "2026-07-24",
-    readingMinutes: 8,
-    excerpt:
-      "What changes in your forties, fifties and sixties, and which checks are worth repeating annually rather than once and forgetting.",
-  },
-  {
-    id: "better-sleep",
-    title: "Simple steps toward better sleep, without a prescription",
-    category: "Pulmonology",
-    date: "16 July 2026",
-    dateTime: "2026-07-16",
+    id: "kidney-diabetes",
+    title: "Living with diabetes: the kidney tests that are easy to forget",
+    category: "Nephrology",
+    date: "19 July 2026",
+    dateTime: "2026-07-19",
     readingMinutes: 6,
     excerpt:
-      "Snoring that wakes the household is not just a nuisance. What ordinary poor sleep looks like, and where it crosses into something we should test for.",
+      "Kidney disease is quiet until it is not. A nephrologist on the two simple tests that catch it a decade early, and how often they should be repeated.",
   },
 ];

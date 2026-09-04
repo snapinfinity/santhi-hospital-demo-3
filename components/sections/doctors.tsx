@@ -2,201 +2,171 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
-import { CalendarClock, ChevronDown, Languages } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import { departments } from "@/data/departments";
 import { doctors } from "@/data/doctors";
-import { departments, getDepartment } from "@/data/departments";
 import { BookButton } from "@/components/appointment/book-button";
+import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { motionTokens, STAGGER } from "@/lib/motion-tokens";
-import { ICON_STROKE } from "@/lib/icons";
+import { buttonStyles } from "@/components/ui/button";
+import { motionTokens } from "@/lib/motion-tokens";
 import { cn } from "@/lib/utils";
 
-const ALL = "all";
 const INITIAL_COUNT = 8;
 
 /**
- * The roster is the page's most important job — someone arrives wanting a named
- * consultant and a time. It is a filterable grid rather than a carousel: a grid
- * cannot scroll sideways out of its container, every card stays whole at every
- * width, and the whole list is reachable without dragging.
+ * The consultant roster as a filterable grid — a grid cannot scroll sideways out
+ * of its container, so every card stays whole at every width. Filtering animates
+ * with layout transitions; the full list stays reachable behind one control.
  */
 export function Doctors() {
-  const [filter, setFilter] = useState(ALL);
+  const [filter, setFilter] = useState<string>("all");
   const [expanded, setExpanded] = useState(false);
   const reduce = useReducedMotion();
 
-  /** Only departments that actually have a consultant listed. */
-  const filters = useMemo(() => {
-    const staffed = new Set(doctors.map((d) => d.departmentId));
-    return departments.filter((d) => staffed.has(d.id));
-  }, []);
-
-  const matching = useMemo(
-    () => (filter === ALL ? doctors : doctors.filter((d) => d.departmentId === filter)),
+  const filtered = useMemo(
+    () => (filter === "all" ? doctors : doctors.filter((d) => d.departmentId === filter)),
     [filter],
   );
+  const visible = expanded ? filtered : filtered.slice(0, INITIAL_COUNT);
+  const hiddenCount = filtered.length - visible.length;
 
-  /** Two full rows to begin with, so the section does not dominate the page. */
-  const visible = expanded ? matching : matching.slice(0, INITIAL_COUNT);
-  const hidden = matching.length - visible.length;
+  function changeFilter(next: string) {
+    setFilter(next);
+    setExpanded(false);
+  }
 
   return (
-    <section id="doctors" aria-labelledby="doctors-heading" className="section-y bg-ground">
-      <div className="mx-auto max-w-[88rem] px-5 lg:px-10">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <section id="doctors" className="section-y bg-ground">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <Reveal>
           <SectionHeading
-            id="doctors-heading"
-            title="The consultant who admits you is the one who reviews you."
-            lede="Continuity is written into our rosters. Book by name, or filter by department and take the first available appointment."
-            className="max-w-2xl"
+            kicker="Consultants"
+            title={
+              <>
+                Specialists who <em className="text-brand italic">stay</em> with your case.
+              </>
+            }
+            lede="The consultant who admits you is the consultant who reviews you. Filter by department, or book straight into the first free slot."
           />
-          <p className="tabular shrink-0 text-sm text-muted lg:text-right">
-            Showing {visible.length} of {matching.length}
-            {filter === ALL ? " consultants" : " in this department"}
-          </p>
-        </div>
+        </Reveal>
 
-        {/* Filter. Wraps rather than scrolls, so nothing can overflow. */}
-        <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter consultants by department">
-          <FilterChip
-            active={filter === ALL}
-            onClick={() => {
-              setFilter(ALL);
-              setExpanded(false);
-            }}
+        {/* Filters */}
+        <Reveal className="mt-8">
+          <div
+            className="rail -mx-1 flex gap-2 overflow-x-auto px-1 pb-2"
+            role="group"
+            aria-label="Filter consultants by department"
           >
-            All departments
-          </FilterChip>
-          {filters.map((department) => (
-            <FilterChip
-              key={department.id}
-              active={filter === department.id}
-              onClick={() => {
-                setFilter(department.id);
-                setExpanded(false);
-              }}
+            <button
+              type="button"
+              onClick={() => changeFilter("all")}
+              aria-pressed={filter === "all"}
+              className={cn(
+                "min-h-11 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors",
+                filter === "all"
+                  ? "border-ink bg-ink text-white"
+                  : "border-brand-line bg-white text-ink-soft hover:border-brand hover:text-brand",
+              )}
             >
-              {department.name}
-            </FilterChip>
-          ))}
-        </div>
-
-        <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((doctor, index) => {
-            const department = getDepartment(doctor.departmentId);
-            return (
-              <motion.li
-                key={doctor.id}
-                layout={!reduce}
-                initial={{ opacity: 0, y: reduce ? 0 : motionTokens.distance.md }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: motionTokens.duration.normal,
-                  ease: motionTokens.easing.smooth,
-                  delay: reduce ? 0 : Math.min(index, 7) * (STAGGER / 2),
-                }}
-                className="group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
+              All ({doctors.length})
+            </button>
+            {departments.map((department) => (
+              <button
+                key={department.id}
+                type="button"
+                onClick={() => changeFilter(department.id)}
+                aria-pressed={filter === department.id}
+                className={cn(
+                  "min-h-11 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors",
+                  filter === department.id
+                    ? "border-ink bg-ink text-white"
+                    : "border-brand-line bg-white text-ink-soft hover:border-brand hover:text-brand",
+                )}
               >
-                <div className="relative aspect-[4/5] overflow-hidden bg-ground-deep">
-                  <Image
-                    src={doctor.portrait}
-                    alt={`Portrait used to represent ${doctor.name}, ${department?.name} consultant. Demonstration image.`}
-                    fill
-                    sizes="(min-width: 1280px) 21vw, (min-width: 1024px) 29vw, (min-width: 640px) 45vw, 90vw"
-                    className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  />
-                  <span className="absolute top-3 left-3 rounded-full bg-white/92 px-2.5 py-1 text-xs font-medium text-brand backdrop-blur-sm">
-                    {department?.name}
-                  </span>
-                </div>
+                {department.name}
+              </button>
+            ))}
+          </div>
+        </Reveal>
 
-                <div className="flex flex-1 flex-col gap-3 p-5">
-                  <div className="min-w-0">
-                    <h3 className="font-display text-xl leading-tight text-ink">{doctor.name}</h3>
-                    <p className="mt-1 text-sm text-muted">{doctor.qualifications}</p>
+        {/* Roster */}
+        <motion.ul layout className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {visible.map((doctor) => (
+              <motion.li
+                layout
+                key={doctor.id}
+                initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+                transition={{ duration: motionTokens.duration.fast, ease: motionTokens.easing.smooth }}
+              >
+                <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-brand-line bg-white shadow-card transition-shadow hover:shadow-lift">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-brand-tint">
+                    <Image
+                      src={doctor.portrait}
+                      alt={`Portrait used to represent ${doctor.name}. The person pictured is not the fictional consultant; demonstration image.`}
+                      fill
+                      sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 92vw"
+                      className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    />
+                    <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-teal-ink backdrop-blur">
+                      {doctor.nextAvailable}
+                    </span>
                   </div>
-
-                  <dl className="flex flex-col gap-1.5 text-sm">
-                    <div className="flex items-center gap-2 text-muted">
-                      <CalendarClock className="size-4 shrink-0 text-teal-ink" strokeWidth={ICON_STROKE} aria-hidden="true" />
-                      <dt className="sr-only">Next available</dt>
-                      <dd className="truncate text-ink">{doctor.nextAvailable}</dd>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted">
-                      <Languages className="size-4 shrink-0 text-teal-ink" strokeWidth={ICON_STROKE} aria-hidden="true" />
-                      <dt className="sr-only">Languages</dt>
-                      <dd className="truncate">{doctor.languages.join(", ")}</dd>
-                    </div>
-                  </dl>
-
-                  <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-                    <p className="tabular text-sm text-muted">
-                      <span className="font-medium text-ink">{doctor.experienceYears}</span> yrs
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="label-sm text-teal-ink">{doctor.role.split("—")[1]?.trim()}</p>
+                    <h3 className="mt-1 font-display text-lg text-ink">{doctor.name}</h3>
+                    <p className="mt-0.5 text-[0.8rem] text-muted">
+                      {doctor.qualifications} · {doctor.experienceYears} yrs
                     </p>
-                    <BookButton
-                      doctorId={doctor.id}
-                      variant="secondary"
-                      ariaLabel={`Book an appointment with ${doctor.name}`}
-                      className="group-hover:border-brand group-hover:bg-brand group-hover:text-white"
-                    >
-                      Book
-                    </BookButton>
+                    <p className="mt-3 line-clamp-2 text-[0.85rem] leading-relaxed text-muted">
+                      {doctor.bio}
+                    </p>
+                    <div className="mt-4 flex flex-1 items-end justify-between gap-3 border-t border-paper-line pt-4">
+                      <p className="text-[0.8rem] text-muted">{doctor.languages.join(" · ")}</p>
+                      <BookButton
+                        doctorId={doctor.id}
+                        variant="secondary"
+                        className="min-h-9 shrink-0 px-4 text-sm"
+                        ariaLabel={`Book with ${doctor.name}`}
+                      >
+                        Book
+                        <ArrowRight aria-hidden="true" className="size-3.5" />
+                      </BookButton>
+                    </div>
                   </div>
-                </div>
+                </article>
               </motion.li>
-            );
-          })}
-        </ul>
+            ))}
+          </AnimatePresence>
+        </motion.ul>
 
-        <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {hidden > 0 ? (
+        {/* Progressive reveal */}
+        <div className="mt-10 flex justify-center">
+          {hiddenCount > 0 ? (
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-brand-line bg-white px-5 text-[0.9375rem] font-medium text-brand transition-colors duration-150 hover:border-brand hover:bg-brand-tint"
+              className={buttonStyles("secondary", "lg")}
             >
-              Show {hidden} more {hidden === 1 ? "consultant" : "consultants"}
-              <ChevronDown
-                className="size-4 transition-transform duration-200 group-hover:translate-y-0.5 motion-reduce:transition-none"
-                strokeWidth={ICON_STROKE}
-                aria-hidden="true"
-              />
+              Show {hiddenCount} more consultant{hiddenCount === 1 ? "" : "s"}
+              <ChevronDown aria-hidden="true" className="size-4" />
             </button>
-          ) : (
-            <span />
-          )}
-          <p className="text-sm text-muted">
-            Consultants, availability and portraits are demonstration content.
-          </p>
+          ) : filtered.length > INITIAL_COUNT ? (
+            <button
+              type="button"
+              onClick={() => setExpanded(false)}
+              className={buttonStyles("ghost", "lg")}
+            >
+              Show fewer
+              <ChevronDown aria-hidden="true" className="size-4 rotate-180" />
+            </button>
+          ) : null}
         </div>
       </div>
     </section>
-  );
-}
-
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-medium transition-colors duration-150",
-        active
-          ? "border-brand bg-brand text-white"
-          : "border-brand-line bg-white text-ink hover:border-brand hover:text-brand",
-      )}
-    >
-      {children}
-    </button>
   );
 }

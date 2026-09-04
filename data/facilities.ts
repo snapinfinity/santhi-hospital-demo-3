@@ -44,8 +44,8 @@ export const facilities: Facility[] = [
   {
     id: "nicu",
     name: "Neonatal Intensive Care Unit",
-    capacity: "Level III",
-    capacityLabel: "Neonatal designation",
+    capacity: "III",
+    capacityLabel: "Level designation",
     description:
       "Care for babies from 26 weeks, with parents welcome at any hour and a kangaroo-care room next to the nursery.",
   },
@@ -69,7 +69,7 @@ export const facilities: Facility[] = [
     id: "rooms",
     name: "Private Patient Rooms",
     capacity: "180",
-    capacityLabel: "Inpatient rooms",
+    capacityLabel: "Inpatient beds",
     description:
       "Single rooms with an attendant bed, daylight on every ward and quiet hours observed from 9 PM so recovery is not interrupted.",
   },

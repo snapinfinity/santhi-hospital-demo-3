@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Santhi Hospital design tokens.
+   Santhi Hospital — "Editorial Arch" design system.
 
-   The palette is the one supplied with the brief, declared once here so no
-   component carries a raw hex value.
+   The palette is carried over from the hospital's brand and declared once
+   here so no component carries a raw hex value. Contrast rules:
+   - #413a97 is the only brand colour that clears AA for body copy.
+   - #ec1c24 is limited to emergency indicators.
+   - #42a3aa is decorative only; #004c59 carries any teal text.
    --------------------------------------------------------------------------- */
 
 @theme {
   /* Primary */
-  --color-brand: #413a97; /* the only brand colour that clears AA for body copy */
-  --color-brand-ink: #332d7c; /* hover / pressed */
+  --color-brand: #413a97;
+  --color-brand-ink: #332d7c;
   --color-brand-tint: #e9e7f3;
   --color-brand-wash: #f5f4fa;
   --color-brand-line: #d5d2e7;
@@ -20,17 +23,18 @@
   --color-accent-ink: #b31119;
 
   /* Teal */
-  --color-teal: #42a3aa; /* decorative; fails contrast as small text on white */
-  --color-teal-ink: #004c59; /* readable teal */
-  --color-ink: #002726; /* dark sections and strong type */
+  --color-teal: #42a3aa;
+  --color-teal-tint: #e0efef;
+  --color-teal-ink: #004c59;
+  --color-ink: #002726;
   --color-ink-soft: #14403e;
   --color-ink-muted: #9db8b7;
 
-  /* Grounds — violet-biased, never a neutral grey */
-  --color-ground: #f1f0f6;
-  --color-ground-deep: #e4e2ee;
-  --color-paper: #efebe0;
-  --color-paper-line: #ddd6c6;
+  /* Grounds — violet-biased and warm, never a neutral grey */
+  --color-ground: #f3f2f8;
+  --color-ground-deep: #e6e4f0;
+  --color-paper: #fbf9f4;
+  --color-paper-line: #e5dfd1;
   --color-muted: #5b5872;
 
   /* Ribbon */
@@ -40,15 +44,15 @@
   --color-ribbon-4: #42a3aa;
 
   /* Type */
-  --font-display: var(--font-newsreader), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: clamp(2.5rem, 5.4vw, 4.25rem);
-  --text-display--line-height: 1.04;
+  --text-display: clamp(2.6rem, 5.8vw, 4.75rem);
+  --text-display--line-height: 1.02;
   --text-display--letter-spacing: -0.025em;
 
-  --text-headline: clamp(1.8rem, 3.4vw, 2.6rem);
-  --text-headline--line-height: 1.1;
+  --text-headline: clamp(1.85rem, 3.4vw, 2.7rem);
+  --text-headline--line-height: 1.08;
   --text-headline--letter-spacing: -0.02em;
 
   --text-title: clamp(1.3rem, 2vw, 1.7rem);
@@ -58,9 +62,13 @@
   --text-lede: clamp(1.02rem, 1.2vw, 1.18rem);
   --text-lede--line-height: 1.55;
 
+  --text-mega: clamp(4rem, 15vw, 13rem);
+  --text-mega--line-height: 0.9;
+  --text-mega--letter-spacing: -0.04em;
+
   /* Depth. Two levels only — a resting edge and a lifted state. */
   --shadow-card: 0 1px 2px rgb(0 39 38 / 0.05), 0 8px 24px -12px rgb(0 39 38 / 0.14);
-  --shadow-lift: 0 2px 4px rgb(0 39 38 / 0.06), 0 18px 40px -16px rgb(65 58 151 / 0.28);
+  --shadow-lift: 0 2px 4px rgb(0 39 38 / 0.06), 0 18px 40px -16px rgb(65 58 151 / 0.3);
 }
 
 /* ---------------------------------------------------------------------------
@@ -70,7 +78,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 6.5rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -140,11 +148,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/**
- * Small functional label — a step counter, a field legend, a footer column head.
- * Deliberately sentence case rather than a tracked-out all-caps eyebrow, which
- * reads as template chrome when it sits above every heading on a page.
- */
+/** Small functional label — field legends, meta lines, footer column heads. */
 @utility label-sm {
   font-size: 0.8125rem;
   font-weight: 500;
@@ -159,14 +163,25 @@
   background-size: 32px 32px;
 }
 
+/** Arch-topped frames — the Kerala motif that carries the whole identity. */
+@utility arch {
+  border-start-start-radius: 999px;
+  border-start-end-radius: 999px;
+}
+
+@utility arch-sm {
+  border-start-start-radius: 3rem;
+  border-start-end-radius: 3rem;
+}
+
 /**
- * Above-the-fold entrance, in CSS so it plays on first paint without waiting for
- * hydration and still runs for visitors without JavaScript.
+ * Above-the-fold entrance, in CSS so it plays on first paint without waiting
+ * for hydration and still runs for visitors without JavaScript.
  */
 @keyframes santhi-rise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -175,12 +190,61 @@
 }
 
 @utility rise {
-  animation: santhi-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: santhi-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/** Endless horizontal ticker. The track holds two copies of its content. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility marquee-track {
+  animation: marquee 38s linear infinite;
+}
+
+/** Gentle floating for hero badge cards. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@utility float-soft {
+  animation: float-soft 7s ease-in-out infinite;
+}
+
+/** Expanding ring for the live emergency dot. */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(236 28 36 / 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgb(236 28 36 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(236 28 36 / 0);
+  }
+}
+
+@utility pulse-dot {
+  animation: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise {
-    animation: none;
+  .rise,
+  .marquee-track,
+  .float-soft,
+  .pulse-dot {
+    animation: none !important;
   }
 }
 

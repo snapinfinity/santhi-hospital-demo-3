@@ -34,7 +34,7 @@ export const departments: Department[] = [
     summary:
       "A stroke-ready unit with round-the-clock imaging and thrombolysis, alongside outpatient clinics for epilepsy, movement disorders and headache.",
     focus: "Neurosciences",
-    services: ["Stroke thrombolysis", "EEG & nerve conduction", "Epilepsy clinic", "Movement disorder clinic"],
+    services: ["Stroke thrombolysis", "EEG & nerve conduction", "Epilepsy clinic", "Headache clinic"],
     consultants: 7,
   },
   {
@@ -52,7 +52,7 @@ export const departments: Department[] = [
     summary:
       "Medical and radiation oncology run as a single tumour board, so every treatment plan is agreed by the full team before it is offered to a patient.",
     focus: "Cancer care",
-    services: ["Day-care chemotherapy", "Radiation therapy", "Tumour board review", "Palliative & supportive care"],
+    services: ["Day-care chemotherapy", "Radiation therapy", "Tumour board review", "Palliative care"],
     consultants: 8,
   },
   {
@@ -106,7 +106,7 @@ export const departments: Department[] = [
     summary:
       "The front door for most patients — assessment, diagnosis and onward referral, with physicians who coordinate care across every other department.",
     focus: "Internal medicine",
-    services: ["Diabetes clinic", "Thyroid clinic", "Infection management", "Preventive health review"],
+    services: ["Diabetes clinic", "Thyroid clinic", "Fever clinic", "Preventive health review"],
     consultants: 14,
   },
   {

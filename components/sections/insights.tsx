@@ -1,75 +1,102 @@
 import Image from "next/image";
-import { Clock } from "lucide-react";
+import { ArrowUpRight, Clock3 } from "lucide-react";
 import { articles } from "@/data/articles";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ICON_STROKE } from "@/lib/icons";
+import { buttonStyles } from "@/components/ui/button";
 
 /**
- * Health writing as an editorial index. Individual article routes are out of
- * scope for the homepage, so entries are headings rather than links that would
- * lead nowhere.
+ * Health insights: one featured story with photography, the rest as editorial
+ * rows. Articles are demonstration content, not medical advice.
  */
 export function Insights() {
-  const [lead, ...rest] = articles;
+  const [featured, ...rest] = articles;
 
   return (
-    <section id="insights" aria-labelledby="insights-heading" className="section-y bg-white">
-      <div className="mx-auto max-w-[88rem] px-5 lg:px-10">
-        <SectionHeading
-          id="insights-heading"
-          title="Written by the clinicians who answer these questions all day."
-        />
+    <section id="insights" className="section-y bg-ground">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <Reveal>
+            <SectionHeading
+              kicker="Health insights"
+              title={
+                <>
+                  Notes from our <em className="text-brand italic">clinicians</em>.
+                </>
+              }
+              lede="Plain-language writing from the people who see these questions every week."
+            />
+          </Reveal>
+          <Reveal index={1}>
+            <a href="#insights" className={buttonStyles("ghost", "md")}>
+              All articles
+              <ArrowUpRight aria-hidden="true" className="size-4" />
+            </a>
+          </Reveal>
+        </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-12">
-          <Reveal as="article" className="lg:col-span-5">
-            <figure className="relative aspect-[16/10] overflow-hidden rounded-2xl">
-              <Image
-                src="/images/scenes/records-review.jpg"
-                alt="A doctor talking a patient through their medical records during a consultation."
-                fill
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                className="object-cover"
-              />
-            </figure>
-            <p className="mt-4 text-sm text-teal-ink">{lead.category}</p>
-            <h3 className="mt-1 font-display text-title text-ink">{lead.title}</h3>
-            <p className="mt-2 max-w-[46ch] text-muted">{lead.excerpt}</p>
-            <p className="tabular mt-3 flex items-center gap-2 text-sm text-muted">
-              <time dateTime={lead.dateTime}>{lead.date}</time>
-              <span aria-hidden="true" className="size-1 rounded-full bg-brand-line" />
-              <Clock className="size-3.5" strokeWidth={ICON_STROKE} aria-hidden="true" />
-              {lead.readingMinutes} min read
-            </p>
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:gap-12">
+          {/* Featured */}
+          <Reveal>
+            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-brand-line bg-white shadow-card transition-shadow hover:shadow-lift">
+              <div className="relative aspect-[16/9] overflow-hidden bg-brand-tint">
+                <Image
+                  src="/images/scenes/desk-consult.jpg"
+                  alt="A consultant talking a patient through their results at a desk. Demonstration photograph."
+                  fill
+                  sizes="(min-width: 1024px) 56vw, 92vw"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                />
+                <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-brand backdrop-blur">
+                  {featured.category}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col p-7">
+                <h3 className="font-display text-[1.55rem] leading-snug text-ink">
+                  <a href="#insights" className="transition-colors group-hover:text-brand">
+                    {featured.title}
+                  </a>
+                </h3>
+                <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-muted">
+                  {featured.excerpt}
+                </p>
+                <p className="mt-5 flex items-center gap-2 text-[0.85rem] text-muted">
+                  <Clock3 aria-hidden="true" className="size-4" />
+                  <time dateTime={featured.dateTime}>{featured.date}</time>
+                  <span aria-hidden="true">·</span>
+                  {featured.readingMinutes} min read
+                </p>
+              </div>
+            </article>
           </Reveal>
 
-          <div className="lg:col-span-7">
-            <h3 className="sr-only">More articles</h3>
-            <ul className="border-t border-brand-line">
-              {rest.map((article) => (
-                <li
-                  key={article.id}
-                  className="grid gap-1.5 border-b border-brand-line py-4 sm:grid-cols-[8.5rem_1fr] sm:gap-6"
+          {/* Rows */}
+          <ul className="flex flex-col">
+            {rest.map((article, index) => (
+              <Reveal key={article.id} index={index % 4} as="li">
+                <a
+                  href="#insights"
+                  className="group flex items-start gap-5 border-t border-brand-line py-5 first:border-t-0 first:pt-0 lg:first:border-t lg:first:pt-5"
                 >
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-sm text-teal-ink">{article.category}</p>
-                    <p className="tabular text-sm text-muted">
+                  <span className="flex-1">
+                    <span className="label-sm text-teal-ink">{article.category}</span>
+                    <span className="mt-1 block font-display text-[1.15rem] leading-snug text-ink transition-colors group-hover:text-brand">
+                      {article.title}
+                    </span>
+                    <span className="mt-1.5 flex items-center gap-2 text-[0.8rem] text-muted">
                       <time dateTime={article.dateTime}>{article.date}</time>
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-display text-lg leading-snug text-ink">{article.title}</h4>
-                    <p className="mt-1.5 max-w-[58ch] text-sm leading-relaxed text-muted">
-                      {article.excerpt}
-                    </p>
-                    <p className="tabular mt-1.5 text-sm text-muted">
-                      {article.readingMinutes} min read
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                      <span aria-hidden="true">·</span>
+                      {article.readingMinutes} min
+                    </span>
+                  </span>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="mt-1 size-5 shrink-0 text-muted transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand"
+                  />
+                </a>
+              </Reveal>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

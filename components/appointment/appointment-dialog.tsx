@@ -1,53 +1,34 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import * as Dialog from "@radix-ui/react-dialog";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { Check, ChevronLeft, X } from "lucide-react";
 import { departments, getDepartment } from "@/data/departments";
-import { doctors as allDoctors, doctorsForDepartment, getDoctor } from "@/data/doctors";
+import { doctorsForDepartment, getDoctor } from "@/data/doctors";
 import { buildAvailability, type DaySlots } from "@/data/availability";
-import { CalendarClock, Check, UserRound, X } from "lucide-react";
-import { buttonStyles } from "@/components/ui/button";
+import { Button, buttonStyles } from "@/components/ui/button";
 import { motionTokens, springs } from "@/lib/motion-tokens";
 import { departmentIcons, ICON_STROKE } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import type { BookingPrefill } from "./appointment-provider";
 
-const STEPS = ["department", "doctor", "schedule", "details"] as const;
-type Step = (typeof STEPS)[number] | "confirmed";
+type Step = 0 | 1 | 2 | 3 | 4;
 
-const STEP_TITLES: Record<Step, string> = {
-  department: "Which department do you need?",
-  doctor: "Choose a consultant",
-  schedule: "Pick a date and time",
-  details: "Your details",
-  confirmed: "Appointment request confirmed",
-};
+const STEP_LABELS = ["Department", "Consultant", "Time", "Details"] as const;
 
-const ANY_DOCTOR = "any";
+type Errors = { name?: string; phone?: string };
 
-type Errors = Partial<Record<"name" | "phone" | "email", string>>;
-
-function validate(values: { name: string; phone: string; email: string }): Errors {
-  const errors: Errors = {};
-
-  if (values.name.trim().length < 2) {
-    errors.name = "Enter the patient's full name.";
-  }
-
-  const digits = values.phone.replace(/[\s-]/g, "").replace(/^\+91/, "");
-  if (!/^[6-9]\d{9}$/.test(digits)) {
-    errors.phone = "Enter a 10-digit mobile number so we can confirm the appointment.";
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email.trim())) {
-    errors.email = "Enter an email address in the format name@example.com.";
-  }
-
-  return errors;
-}
-
+/**
+ * The booking flow: department → consultant → time → details → confirmation.
+ *
+ * Steps animate in on mount rather than through `AnimatePresence mode="wait"` —
+ * with `mode="wait"` the next step cannot render until the previous one has
+ * finished animating out, so anywhere animation frames are throttled the
+ * visitor is stranded mid-booking. Progressing through a form must never depend
+ * on an animation completing.
+ */
 export function AppointmentDialog({
   open,
   onOpenChange,
@@ -57,532 +38,481 @@ export function AppointmentDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefill: BookingPrefill;
+  /** Bumped on every open — remounts the flow with fresh state. */
   session: number;
 }) {
-  const reduce = useReducedMotion();
-
-  return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <AnimatePresence>
-        {open ? (
-          <Dialog.Portal forceMount>
-            <Dialog.Overlay asChild forceMount>
-              <motion.div
-                key="appointment-overlay"
-                className="fixed inset-0 z-40 bg-ink/55 backdrop-blur-[2px]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: motionTokens.duration.fast }}
-              />
-            </Dialog.Overlay>
-
-            {/* Full-screen positioner. Radix forces `pointer-events: auto` on
-                its content, so the overlay underneath never receives the click
-                that would dismiss the dialog — the positioner closes it itself
-                when the press lands on the backdrop area rather than the panel. */}
-            <Dialog.Content asChild forceMount aria-modal="true">
-              <div
-                className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
-                onPointerDown={(event) => {
-                  if (event.target === event.currentTarget) onOpenChange(false);
-                }}
-              >
-                <motion.div
-                  key="appointment-panel"
-                  className="flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-h-[88vh] sm:max-w-2xl sm:rounded-2xl"
-                  initial={{ opacity: 0, y: reduce ? 0 : motionTokens.distance.lg, scale: reduce ? 1 : 0.99 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: reduce ? 0 : motionTokens.distance.lg, scale: reduce ? 1 : 0.99 }}
-                  transition={springs.gentle}
-                >
-                  <BookingFlow key={session} prefill={prefill} onClose={() => onOpenChange(false)} />
-                </motion.div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        ) : null}
-      </AnimatePresence>
-    </Dialog.Root>
-  );
-}
-
-function BookingFlow({ prefill, onClose }: { prefill: BookingPrefill; onClose: () => void }) {
-  const reduce = useReducedMotion();
-
-  const prefilledDoctor = prefill.doctorId ? getDoctor(prefill.doctorId) : undefined;
-  const initialDepartment = prefilledDoctor?.departmentId ?? prefill.departmentId ?? null;
-
-  const [step, setStep] = useState<Step>(
-    prefilledDoctor ? "schedule" : initialDepartment ? "doctor" : "department",
-  );
-  const [departmentId, setDepartmentId] = useState<string | null>(initialDepartment);
-  const [doctorId, setDoctorId] = useState<string | null>(prefilledDoctor?.id ?? null);
-  const [dayIso, setDayIso] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>(0);
+  const [departmentId, setDepartmentId] = useState<string | null>(null);
+  const [doctorId, setDoctorId] = useState<string | null>(null);
+  const [day, setDay] = useState<DaySlots | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
-  const [values, setValues] = useState({ name: "", phone: "", email: "", reason: "" });
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [note, setNote] = useState("");
   const [errors, setErrors] = useState<Errors>({});
-
-  /** Generated once when the dialog opens — never during a server render. */
-  const [availability] = useState<DaySlots[]>(() => buildAvailability());
 
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
+
+  // A fresh session every time the dialog opens, applying any preselection.
+  useEffect(() => {
+    if (!open) return;
+    setErrors({});
+    const preselectedDoctor = prefill.doctorId ? getDoctor(prefill.doctorId) : undefined;
+    if (preselectedDoctor) {
+      setDoctorId(preselectedDoctor.id);
+      setDepartmentId(preselectedDoctor.departmentId);
+      setStep(2);
+    } else if (prefill.departmentId) {
+      setDoctorId(null);
+      setDepartmentId(prefill.departmentId);
+      setStep(1);
+    } else {
+      setDoctorId(null);
+      setDepartmentId(null);
+      setStep(0);
+    }
+    // Availability is derived client-side only — "today" must never render on the server.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, open]);
 
   const department = departmentId ? getDepartment(departmentId) : undefined;
-  const doctor = doctorId && doctorId !== ANY_DOCTOR ? getDoctor(doctorId) : undefined;
-  const departmentDoctors = departmentId ? doctorsForDepartment(departmentId) : allDoctors;
-  const selectedDay = availability.find((day) => day.iso === dayIso);
+  const doctor = doctorId ? getDoctor(doctorId) : undefined;
+  const departmentDoctors = useMemo(
+    () => (departmentId ? doctorsForDepartment(departmentId) : []),
+    [departmentId],
+  );
+  const availability = useMemo(() => (open ? buildAvailability() : []), [open]);
 
-  const stepIndex = step === "confirmed" ? STEPS.length : STEPS.indexOf(step);
+  const departmentList = departments;
 
-  function goTo(next: Step) {
-    setStep(next);
+  function pickDepartment(id: string) {
+    setDepartmentId(id);
+    setDoctorId(null);
+    setDay(null);
+    setSlot(null);
+    setStep(1);
   }
 
-  function handleBack() {
-    const index = STEPS.indexOf(step as (typeof STEPS)[number]);
-    if (index > 0) goTo(STEPS[index - 1]);
+  function pickDoctor(id: string) {
+    setDoctorId(id);
+    setDay(null);
+    setSlot(null);
+    setStep(2);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const found = validate(values);
-    setErrors(found);
+  function pickDay(next: DaySlots) {
+    setDay(next);
+    setSlot(null);
+  }
 
-    if (Object.keys(found).length > 0) {
-      if (found.name) nameRef.current?.focus();
-      else if (found.phone) phoneRef.current?.focus();
-      else emailRef.current?.focus();
+  function pickTime(next: string) {
+    setSlot(next);
+    setStep(3);
+  }
+
+  function confirm() {
+    const next: Errors = {};
+    if (name.trim().length < 2) next.name = "Please tell us the patient's name.";
+    const digits = phone.replace(/\D/g, "").replace(/^(91|0)/, "");
+    if (digits.length !== 10) next.phone = "Please enter a 10-digit Indian mobile number.";
+    setErrors(next);
+    if (next.name) {
+      nameRef.current?.focus();
       return;
     }
-
-    goTo("confirmed");
+    if (next.phone) {
+      phoneRef.current?.focus();
+      return;
+    }
+    setStep(4);
   }
 
-  const canContinueSchedule = Boolean(dayIso && slot);
+  const summary = [
+    doctor ? { label: "Consultant", value: doctor.name } : null,
+    department ? { label: "Department", value: department.name } : null,
+    day && slot ? { label: "When", value: `${day.longLabel}, ${slot}` } : null,
+  ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (
-    <>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 border-b border-ground-deep px-5 py-4 sm:px-7 sm:py-5">
-        <div className="min-w-0">
-          <p className="label-sm text-teal-ink">
-            {step === "confirmed" ? "Confirmed" : `Step ${stepIndex + 1} of ${STEPS.length}`}
-          </p>
-          <Dialog.Title className="mt-1 font-display text-xl leading-tight text-ink sm:text-2xl">
-            {STEP_TITLES[step]}
-          </Dialog.Title>
-        </div>
-        <Dialog.Close
-          className="-mr-1 -mt-1 shrink-0 rounded-full p-2 text-muted transition-colors hover:bg-ground hover:text-ink"
-          aria-label="Close booking"
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60" />
+        <Dialog.Content
+          key={session}
+          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
         >
-          <X className="size-5" strokeWidth={ICON_STROKE} aria-hidden="true" />
-        </Dialog.Close>
-      </div>
-
-      {/* Progress — the ribbon doing quiet structural work */}
-      <div className="h-1 w-full bg-ground" aria-hidden="true">
-        <motion.div
-          className="ribbon-sweep h-full origin-left"
-          initial={false}
-          animate={{ scaleX: (stepIndex + (step === "confirmed" ? 0 : 1)) / STEPS.length }}
-          transition={
-            reduce
-              ? { duration: motionTokens.duration.instant }
-              : { duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }
-          }
-          style={{ transformOrigin: "left" }}
-        />
-      </div>
-
-      {/* Body
-          Steps animate in on mount rather than through AnimatePresence: with
-          `mode="wait"` the next step cannot render until the previous one has
-          finished animating out, which strands the visitor mid-booking wherever
-          animation frames are throttled — a backgrounded tab, a low-end device.
-          Progressing through a form must never depend on an animation
-          completing, so the outgoing step is simply replaced. */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-7 sm:py-6">
-        <div>
           <motion.div
-            key={step}
-            initial={{ opacity: 0, x: reduce ? 0 : motionTokens.distance.md }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: motionTokens.duration.fast, ease: motionTokens.easing.smooth }}
+            initial={{ opacity: 0, y: 28, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}
+            className="flex max-h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-paper shadow-lift sm:rounded-3xl"
           >
-            {step === "department" ? (
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {departments.map((item) => (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDepartmentId(item.id);
-                        setDoctorId(null);
-                        goTo("doctor");
-                      }}
-                      className={cn(
-                        "flex w-full flex-col gap-0.5 rounded-xl border p-3.5 text-left transition-colors",
-                        departmentId === item.id
-                          ? "border-brand bg-brand-tint"
-                          : "border-ground-deep hover:border-brand hover:bg-brand-tint/60",
-                      )}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        {departmentIcons[item.id]
-                          ? (() => {
-                              const Icon = departmentIcons[item.id];
-                              return <Icon className="size-[1.15rem] shrink-0 text-teal-ink" strokeWidth={ICON_STROKE} aria-hidden="true" />;
-                            })()
-                          : null}
-                        <span className="font-medium text-ink">{item.name}</span>
-                      </span>
-                      <span className="text-sm text-muted">
-                        {item.consultants} consultants, {item.focus.toLowerCase()}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            {step === "doctor" ? (
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDoctorId(ANY_DOCTOR);
-                    goTo("schedule");
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl border p-3.5 text-left transition-colors",
-                    doctorId === ANY_DOCTOR
-                      ? "border-brand bg-brand-tint"
-                      : "border-ground-deep hover:border-brand hover:bg-brand-tint/60",
-                  )}
-                >
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ground text-teal-ink">
-                    <UserRound className="size-5" strokeWidth={ICON_STROKE} aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block font-medium text-ink">First available consultant</span>
-                    <span className="block text-sm text-muted">
-                      Usually the soonest appointment in {department?.name ?? "this department"}
-                    </span>
-                  </span>
-                </button>
-
-                {departmentDoctors.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      setDoctorId(item.id);
-                      goTo("schedule");
-                    }}
-                    className={cn(
-                      "flex items-center gap-3 rounded-xl border p-3.5 text-left transition-colors",
-                      doctorId === item.id
-                        ? "border-brand bg-brand-tint"
-                        : "border-ground-deep hover:border-brand hover:bg-brand-tint/60",
-                    )}
-                  >
-                    <span className="relative size-12 shrink-0 overflow-hidden rounded-full bg-ground-deep">
-                      <Image
-                        src={item.portrait}
-                        alt=""
-                        fill
-                        sizes="48px"
-                        className="object-cover object-top"
-                      />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block font-medium text-ink">{item.name}</span>
-                      <span className="block truncate text-sm text-muted">
-                        {item.qualifications} · {item.experienceYears} years
-                      </span>
-                      <span className="mt-0.5 flex items-center gap-1.5 text-sm text-teal-ink">
-                        <CalendarClock className="size-3.5 shrink-0" strokeWidth={ICON_STROKE} aria-hidden="true" />
-                        {item.nextAvailable}
-                      </span>
-                    </span>
-                  </button>
-                ))}
+            <div className="flex items-center justify-between gap-4 border-b border-paper-line px-6 py-4 sm:px-8">
+              <div>
+                <Dialog.Title className="font-display text-xl text-ink">
+                  {step === 4 ? "You are booked in" : "Book an appointment"}
+                </Dialog.Title>
+                <Dialog.Description className="label-sm mt-0.5 text-muted">
+                  Under a minute · no account needed
+                </Dialog.Description>
               </div>
+              <Dialog.Close
+                className="grid size-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-brand-tint hover:text-ink"
+              >
+                <X aria-hidden="true" className="size-5" />
+                <span className="sr-only">Close</span>
+              </Dialog.Close>
+            </div>
+
+            {step < 4 ? (
+              <ol className="flex items-center gap-2 border-b border-paper-line px-6 py-3.5 sm:px-8" aria-label="Booking progress">
+                {STEP_LABELS.map((label, index) => {
+                  const state = index < step ? "done" : index === step ? "active" : "todo";
+                  return (
+                    <li key={label} className="flex flex-1 items-center gap-2 last:flex-none">
+                      <span
+                        aria-current={state === "active" ? "step" : undefined}
+                        className={cn(
+                          "grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold tabular transition-colors",
+                          state === "done" && "border-brand bg-brand text-white",
+                          state === "active" && "border-ink bg-ink text-white",
+                          state === "todo" && "border-paper-line bg-white text-muted",
+                        )}
+                      >
+                        {state === "done" ? <Check aria-hidden="true" className="size-3.5" /> : index + 1}
+                      </span>
+                      <span
+                        className={cn(
+                          "hidden text-[0.8rem] font-medium sm:block",
+                          state === "todo" ? "text-muted" : "text-ink",
+                        )}
+                      >
+                        {label}
+                      </span>
+                      {index < STEP_LABELS.length - 1 ? (
+                        <span aria-hidden="true" className="mx-1 h-px flex-1 bg-paper-line" />
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ol>
             ) : null}
 
-            {step === "schedule" ? (
-              <div className="flex flex-col gap-6">
-                <fieldset>
-                  <legend className="label-sm mb-2.5 text-teal-ink">Choose a day</legend>
-                  <div className="rail -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-                    {availability.map((day) => {
-                      const disabled = day.slots.length === 0;
+            <div className="min-h-[22rem] overflow-y-auto px-6 py-6 sm:px-8">
+              {/* Step 0 — department */}
+              {step === 0 ? (
+                <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}>
+                  <h3 className="mb-1 font-display text-lg text-ink">Which department?</h3>
+                  <p className="mb-5 text-sm text-muted">
+                    Not sure? General Medicine is the right first stop — its physicians refer
+                    onwards the same day.
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {departmentList.map((item) => {
+                      const Icon = departmentIcons[item.id];
                       return (
-                        <label
-                          key={day.iso}
-                          className={cn(
-                            "flex shrink-0 cursor-pointer flex-col items-center rounded-xl border px-4 py-2.5 text-center transition-colors",
-                            disabled && "cursor-not-allowed opacity-45",
-                            dayIso === day.iso
-                              ? "border-brand bg-brand text-white"
-                              : "border-ground-deep hover:border-brand",
-                          )}
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => pickDepartment(item.id)}
+                          className="flex min-h-14 items-center gap-3 rounded-xl border border-paper-line bg-white px-4 py-3 text-left transition-all hover:border-brand hover:shadow-card"
                         >
-                          <input
-                            type="radio"
-                            name="appointment-day"
-                            value={day.iso}
-                            disabled={disabled}
-                            checked={dayIso === day.iso}
-                            onChange={() => {
-                              setDayIso(day.iso);
-                              setSlot(null);
-                            }}
-                            className="sr-only"
-                          />
-                          <span className="text-sm font-medium whitespace-nowrap">{day.label}</span>
-                          <span
-                            className={cn(
-                              "tabular text-xs",
-                              dayIso === day.iso ? "text-white/80" : "text-muted",
-                            )}
-                          >
-                            {disabled ? "Closed" : `${day.slots.length} slots`}
+                          {Icon ? (
+                            <Icon aria-hidden="true" strokeWidth={ICON_STROKE} className="size-5 shrink-0 text-brand" />
+                          ) : null}
+                          <span className="min-w-0">
+                            <span className="block truncate text-[0.9375rem] font-medium text-ink">{item.name}</span>
+                            <span className="block truncate text-xs text-muted">{item.focus}</span>
                           </span>
-                        </label>
+                        </button>
                       );
                     })}
                   </div>
-                </fieldset>
+                </motion.div>
+              ) : null}
 
-                <fieldset>
-                  <legend className="label-sm mb-2.5 text-teal-ink">Choose a time</legend>
-                  {!selectedDay ? (
-                    <p className="text-sm text-muted">Select a day to see available times.</p>
-                  ) : selectedDay.slots.length === 0 ? (
-                    <p className="text-sm text-muted">{selectedDay.note}</p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                      {selectedDay.slots.map((time) => (
-                        <label
-                          key={time}
-                          className={cn(
-                            "tabular flex cursor-pointer items-center justify-center rounded-xl border py-3 text-sm font-medium transition-colors",
-                            slot === time
-                              ? "border-brand bg-brand text-white"
-                              : "border-ground-deep hover:border-brand hover:bg-brand-tint/60",
-                          )}
-                        >
-                          <input
-                            type="radio"
-                            name="appointment-slot"
-                            value={time}
-                            checked={slot === time}
-                            onChange={() => setSlot(time)}
-                            className="sr-only"
+              {/* Step 1 — consultant */}
+              {step === 1 && department ? (
+                <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}>
+                  <button
+                    type="button"
+                    onClick={() => setStep(0)}
+                    className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand transition-colors hover:text-brand-ink"
+                  >
+                    <ChevronLeft aria-hidden="true" className="size-4" /> All departments
+                  </button>
+                  <h3 className="mb-1 font-display text-lg text-ink">
+                    Who would you like to see in {department.name}?
+                  </h3>
+                  <p className="mb-5 text-sm text-muted">
+                    Featured consultants for this department. You can also request any available
+                    colleague when you arrive.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {departmentDoctors.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => pickDoctor(item.id)}
+                        className="flex min-h-16 items-center gap-4 rounded-xl border border-paper-line bg-white px-4 py-3 text-left transition-all hover:border-brand hover:shadow-card"
+                      >
+                        <span className="relative size-12 shrink-0 overflow-hidden rounded-full bg-brand-tint">
+                          <Image
+                            src={item.portrait}
+                            alt=""
+                            fill
+                            sizes="48px"
+                            className="object-cover"
                           />
-                          {time}
-                        </label>
-                      ))}
-                    </div>
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[0.9375rem] font-medium text-ink">{item.name}</span>
+                          <span className="block truncate text-xs text-muted">
+                            {item.qualifications} · {item.experienceYears} yrs
+                          </span>
+                        </span>
+                        <span className="hidden shrink-0 rounded-full bg-teal-tint px-3 py-1 text-xs font-medium text-teal-ink sm:block">
+                          {item.nextAvailable}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : null}
+
+              {/* Step 2 — time */}
+              {step === 2 && doctor && department ? (
+                <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}>
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand transition-colors hover:text-brand-ink"
+                  >
+                    <ChevronLeft aria-hidden="true" className="size-4" /> All consultants
+                  </button>
+                  <div className="mb-5 flex items-center gap-4">
+                    <span className="relative size-14 shrink-0 overflow-hidden rounded-full bg-brand-tint">
+                      <Image src={doctor.portrait} alt="" fill sizes="56px" className="object-cover" />
+                    </span>
+                    <span>
+                      <span className="block font-display text-lg text-ink">{doctor.name}</span>
+                      <span className="block text-sm text-muted">{department.name}</span>
+                    </span>
+                  </div>
+
+                  <h3 className="mb-3 font-display text-lg text-ink">Pick a day</h3>
+                  <div className="rail -mx-1 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Available days">
+                    {availability.map((item) => (
+                      <button
+                        key={item.iso}
+                        type="button"
+                        onClick={() => pickDay(item)}
+                        disabled={item.slots.length === 0}
+                        aria-pressed={day?.iso === item.iso}
+                        className={cn(
+                          "min-h-11 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                          day?.iso === item.iso
+                            ? "border-ink bg-ink text-white"
+                            : "border-paper-line bg-white text-ink hover:border-brand",
+                        )}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {day ? (
+                    day.slots.length > 0 ? (
+                      <>
+                        <h3 className="mt-6 mb-3 font-display text-lg text-ink">Pick a time</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {day.slots.map((time) => (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => pickTime(time)}
+                              className={cn(
+                                buttonStyles("secondary", "md", "tabular min-w-24"),
+                              )}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="mt-6 rounded-xl bg-brand-wash px-4 py-3 text-sm text-muted">
+                        {day.note ?? "No clinics this day — please pick another."}
+                      </p>
+                    )
+                  ) : (
+                    <p className="mt-6 text-sm text-muted">Choose a day above to see open slots.</p>
                   )}
-                </fieldset>
-              </div>
-            ) : null}
+                </motion.div>
+              ) : null}
 
-            {step === "details" ? (
-              <form id="appointment-details" onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-                <Field
-                  ref={nameRef}
-                  id="patient-name"
-                  label="Full name"
-                  autoComplete="name"
-                  value={values.name}
-                  error={errors.name}
-                  onChange={(next) => setValues((v) => ({ ...v, name: next }))}
-                />
-                <Field
-                  ref={phoneRef}
-                  id="patient-phone"
-                  label="Phone number"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="98765 43210"
-                  value={values.phone}
-                  error={errors.phone}
-                  onChange={(next) => setValues((v) => ({ ...v, phone: next }))}
-                />
-                <Field
-                  ref={emailRef}
-                  id="patient-email"
-                  label="Email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  placeholder="name@example.com"
-                  value={values.email}
-                  error={errors.email}
-                  onChange={(next) => setValues((v) => ({ ...v, email: next }))}
-                />
+              {/* Step 3 — details */}
+              {step === 3 && doctor && day && slot ? (
+                <motion.form
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    confirm();
+                  }}
+                  noValidate
+                >
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand transition-colors hover:text-brand-ink"
+                  >
+                    <ChevronLeft aria-hidden="true" className="size-4" /> Change time
+                  </button>
 
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="patient-reason" className="text-sm font-medium text-ink">
-                    Reason for visit <span className="font-normal text-muted">(optional)</span>
-                  </label>
-                  <textarea
-                    id="patient-reason"
-                    rows={3}
-                    value={values.reason}
-                    onChange={(event) => setValues((v) => ({ ...v, reason: event.target.value }))}
-                    className="resize-y rounded-xl border border-ground-deep px-3.5 py-2.5 text-[0.9375rem] text-ink placeholder:text-muted/70 focus:border-brand focus:outline-none"
-                    placeholder="A short note helps the consultant prepare."
-                  />
-                  <p className="text-xs text-muted">
-                    Please do not include detailed medical history here.
+                  <dl className="mb-6 rounded-2xl bg-white p-5 shadow-card">
+                    {summary.map((row) => (
+                      <div key={row.label} className="flex items-baseline justify-between gap-4 py-1.5 first:pt-0 last:pb-0">
+                        <dt className="text-sm text-muted">{row.label}</dt>
+                        <dd className="text-[0.9375rem] font-medium text-ink">{row.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="booking-name" className="label-sm mb-1.5 block text-ink">
+                        Patient name
+                      </label>
+                      <input
+                        id="booking-name"
+                        ref={nameRef}
+                        type="text"
+                        autoComplete="name"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        aria-invalid={errors.name ? true : undefined}
+                        className={cn(
+                          "min-h-12 w-full rounded-xl border bg-white px-4 text-[0.9375rem] text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand/25",
+                          errors.name ? "border-accent" : "border-paper-line",
+                        )}
+                        placeholder="Full name"
+                      />
+                      {errors.name ? (
+                        <p role="alert" className="mt-1.5 text-sm text-accent-ink">
+                          {errors.name}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div>
+                      <label htmlFor="booking-phone" className="label-sm mb-1.5 block text-ink">
+                        Mobile number
+                      </label>
+                      <input
+                        id="booking-phone"
+                        ref={phoneRef}
+                        type="tel"
+                        autoComplete="tel"
+                        inputMode="numeric"
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        aria-invalid={errors.phone ? true : undefined}
+                        className={cn(
+                          "min-h-12 w-full rounded-xl border bg-white px-4 text-[0.9375rem] text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand/25",
+                          errors.phone ? "border-accent" : "border-paper-line",
+                        )}
+                        placeholder="10-digit mobile"
+                      />
+                      {errors.phone ? (
+                        <p role="alert" className="mt-1.5 text-sm text-accent-ink">
+                          {errors.phone}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label htmlFor="booking-note" className="label-sm mb-1.5 block text-ink">
+                        Anything we should know? <span className="font-normal text-muted">(optional)</span>
+                      </label>
+                      <textarea
+                        id="booking-note"
+                        value={note}
+                        onChange={(event) => setNote(event.target.value)}
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-paper-line bg-white px-4 py-3 text-[0.9375rem] text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand/25"
+                        placeholder="Symptoms, reports to bring, accessibility needs…"
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" size="lg" className="mt-6 w-full sm:w-auto">
+                    Confirm booking
+                  </Button>
+                  <p className="mt-3 text-xs text-muted">
+                    Demonstration only — no real booking is made and no data leaves this page.
                   </p>
-                </div>
-              </form>
-            ) : null}
+                </motion.form>
+              ) : null}
 
-            {step === "confirmed" ? (
-              <div role="status" aria-live="polite" className="flex flex-col gap-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-teal-ink text-white">
-                    <Check className="size-5" strokeWidth={2.2} aria-hidden="true" />
-                  </span>
-                  <p className="text-lede text-ink">
-                    We have your request. The hospital will call {values.phone.trim()} to confirm.
+              {/* Step 4 — confirmation */}
+              {step === 4 && doctor && day && slot ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: motionTokens.duration.slow, ease: motionTokens.easing.smooth }}
+                  className="flex flex-col items-center py-6 text-center"
+                  role="status"
+                >
+                  <motion.span
+                    initial={{ scale: 0.6, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ ...springs.bouncy, delay: 0.1 }}
+                    className="grid size-16 place-items-center rounded-full bg-brand text-white"
+                  >
+                    <Check aria-hidden="true" className="size-8" />
+                  </motion.span>
+                  <h3 className="mt-5 font-display text-2xl text-ink">
+                    See you soon, {name.trim().split(/\s+/)[0]}.
+                  </h3>
+                  <p className="mt-2 max-w-[46ch] text-[0.95rem] text-muted">
+                    {doctor.name} — {day.longLabel}, {slot}. Our team will call {phone} to
+                    confirm and share directions.
                   </p>
-                </div>
-
-                <dl className="divide-y divide-ground-deep rounded-xl border border-ground-deep">
-                  <SummaryRow label="Consultant" value={doctor ? doctor.name : "First available consultant"} />
-                  <SummaryRow label="Department" value={department?.name ?? "General Medicine"} />
-                  <SummaryRow
-                    label="Date"
-                    value={selectedDay ? selectedDay.longLabel : "To be confirmed"}
-                  />
-                  <SummaryRow label="Time" value={slot ?? "To be confirmed"} />
-                  <SummaryRow label="Patient" value={values.name.trim()} />
-                </dl>
-
-                <p className="rounded-xl bg-paper px-4 py-3 text-sm text-ink-soft">
-                  <strong className="font-semibold">This is a demonstration.</strong> No appointment
-                  has been submitted to a real hospital system, and no details you entered have left
-                  this browser.
-                </p>
-              </div>
-            ) : null}
+                  <dl className="mt-6 w-full max-w-sm rounded-2xl bg-white p-5 text-left shadow-card">
+                    {summary.map((row) => (
+                      <div key={row.label} className="flex items-baseline justify-between gap-4 py-1.5 first:pt-0 last:pb-0">
+                        <dt className="text-sm text-muted">{row.label}</dt>
+                        <dd className="text-[0.9375rem] font-medium text-ink">{row.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className="mt-6 flex flex-wrap justify-center gap-3">
+                    <Dialog.Close asChild>
+                      <Button variant="secondary">Done</Button>
+                    </Dialog.Close>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setStep(0);
+                        setDepartmentId(null);
+                        setDoctorId(null);
+                        setDay(null);
+                        setSlot(null);
+                        setName("");
+                        setPhone("");
+                        setNote("");
+                      }}
+                    >
+                      Book another
+                    </Button>
+                  </div>
+                </motion.div>
+              ) : null}
+            </div>
           </motion.div>
-        </div>
-      </div>
-
-      {/* Footer actions */}
-      <div className="flex items-center justify-between gap-3 border-t border-ground-deep bg-white px-5 py-4 sm:px-7">
-        {step === "confirmed" ? (
-          <>
-            <p className="text-sm text-muted">Reference SH-{new Date().getFullYear()}-4821</p>
-            <button type="button" onClick={onClose} className={buttonStyles("primary", "md")}>
-              Done
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={STEPS.indexOf(step as (typeof STEPS)[number]) === 0}
-              className={buttonStyles("ghost", "md", "disabled:opacity-0")}
-            >
-              Back
-            </button>
-
-            {step === "schedule" ? (
-              <button
-                type="button"
-                onClick={() => goTo("details")}
-                disabled={!canContinueSchedule}
-                className={buttonStyles("primary", "md")}
-              >
-                Continue
-              </button>
-            ) : null}
-
-            {step === "details" ? (
-              <button type="submit" form="appointment-details" className={buttonStyles("primary", "md")}>
-                Confirm appointment
-              </button>
-            ) : null}
-
-            {step === "department" || step === "doctor" ? (
-              <p className="text-sm text-muted">Select one to continue</p>
-            ) : null}
-          </>
-        )}
-      </div>
-    </>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 px-4 py-3">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="text-right font-medium text-ink">{value}</dd>
-    </div>
-  );
-}
-
-function Field({
-  ref,
-  id,
-  label,
-  value,
-  error,
-  onChange,
-  type = "text",
-  ...rest
-}: {
-  ref?: React.Ref<HTMLInputElement>;
-  id: string;
-  label: string;
-  value: string;
-  error?: string;
-  onChange: (value: string) => void;
-  type?: string;
-  autoComplete?: string;
-  inputMode?: "tel" | "email" | "text";
-  placeholder?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-ink">
-        {label}
-      </label>
-      <input
-        ref={ref}
-        id={id}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={cn(
-          "min-h-11 rounded-xl border px-3.5 text-[0.9375rem] text-ink placeholder:text-muted/70 focus:outline-none",
-          error ? "border-accent-ink focus:border-accent-ink" : "border-ground-deep focus:border-brand",
-        )}
-        {...rest}
-      />
-      {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-accent-ink">
-          {error}
-        </p>
-      ) : null}
-    </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

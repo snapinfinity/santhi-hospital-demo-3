@@ -34,10 +34,10 @@ export const faqs: Faq[] = [
       "Yes. The Emergency & Trauma Centre is open 24 hours a day with consultant cover, its own ambulance approach and direct access to imaging, theatres and intensive care. Emergencies never require an appointment — come straight in or call the emergency number.",
   },
   {
-    id: "diagnostics",
-    question: "Are diagnostic and laboratory services available on site?",
+    id: "insurance",
+    question: "Do you accept insurance and cashless treatment?",
     answer:
-      "Imaging, pathology and laboratory services all operate within the hospital. Most laboratory results are available the same day and most imaging is reported within four hours, so a diagnosis rarely needs a second visit.",
+      "We work with all major Indian insurers and third-party administrators through a cashless desk on the ground floor. Send your policy details before planned admission and the desk will confirm coverage and any co-payment in writing.",
   },
   {
     id: "visiting-hours",
@@ -46,9 +46,9 @@ export const faqs: Faq[] = [
       "General wards receive visitors from 11 AM to 1 PM and 4 PM to 7 PM. One attendant may stay overnight in a private room. Intensive care has its own schedule set by the unit, and parents of children admitted to paediatrics or the neonatal unit are welcome at any hour.",
   },
   {
-    id: "contact-department",
-    question: "How do I reach a particular department?",
+    id: "parking",
+    question: "Is parking available, and how do I reach the hospital?",
     answer:
-      "Call the general number and ask for the department by name, or use the contact details at the foot of this page. For questions about an existing admission, the ward number printed on your admission slip reaches the nursing station directly.",
+      "Yes — free parking for patients and visitors, with the entrance directly accessible from the Malabar Coast Road approach. The Eranhipalam bus stop is a two-minute walk, and autorickshaws can drop at the covered porch.",
   },
 ];

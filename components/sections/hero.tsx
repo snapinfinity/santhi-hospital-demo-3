@@ -1,101 +1,149 @@
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, CalendarCheck, ShieldPlus } from "lucide-react";
-import { BookButton } from "@/components/appointment/book-button";
-import { buttonStyles } from "@/components/ui/button";
-import { hospital } from "@/data/site";
-import { ICON_STROKE } from "@/lib/icons";
+"use client";
 
-const trustPoints = [
-  { figure: "35", label: "years in Kottayam" },
-  { figure: "120", label: "consultants" },
-  { figure: "32", label: "departments" },
-];
+import { useRef } from "react";
+import Image from "next/image";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { ArrowRight, MapPin, Star } from "lucide-react";
+import { BookButton } from "@/components/appointment/book-button";
+import { Marquee } from "@/components/ui/marquee";
+import { buttonStyles } from "@/components/ui/button";
+import { hospital, tickerItems } from "@/data/site";
+import { doctors } from "@/data/doctors";
+
+const featured = doctors[0];
+/** Shared portraits for the stacked trust row. */
+const trustPortraits = doctors.slice(0, 3);
 
 export function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "9%"]);
+
+  const rise = (delay: number) => ({ animationDelay: `${delay}s` });
+
   return (
-    <section id="top" aria-labelledby="hero-heading" className="relative overflow-hidden bg-ground">
-      {/* A single soft field of brand colour behind the image column, rather than
-          a gradient across the whole hero. */}
+    <section ref={sectionRef} id="top" className="relative overflow-hidden bg-ground">
+      {/* Ambient washes */}
       <div
         aria-hidden="true"
-        className="absolute top-0 right-0 hidden h-full w-[46%] bg-brand-wash lg:block"
+        className="pointer-events-none absolute -top-40 right-[-10%] size-[36rem] rounded-full bg-brand/10 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-24 left-[-8%] size-[26rem] rounded-full bg-teal/20 blur-3xl"
       />
 
-      <div className="relative mx-auto grid max-w-[88rem] items-center gap-10 px-5 pt-10 pb-12 lg:grid-cols-12 lg:gap-12 lg:px-10 lg:pt-16 lg:pb-20">
-        <div className="lg:col-span-6 xl:col-span-5">
-          <h1 id="hero-heading" className="rise font-display text-display text-ink">
-            Exceptional care, with humanity at the heart of it.
-          </h1>
-
+      <div className="mx-auto grid max-w-7xl gap-14 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-10 lg:pt-20 lg:pb-24">
+        {/* Copy */}
+        <div className="lg:col-span-7">
           <p
-            className="rise mt-5 max-w-[46ch] text-lede text-muted"
-            style={{ animationDelay: "70ms" }}
+            className="rise inline-flex items-center gap-2 rounded-full border border-brand-line bg-white/80 px-4 py-2 text-[0.85rem] font-medium text-ink-soft"
+            style={rise(0.05)}
           >
-            Advanced medicine, experienced specialists and compassionate nursing under one roof —
-            so the people of Kottayam can be treated close to home, by a team that knows them.
+            <MapPin aria-hidden="true" className="size-4 text-teal-ink" />
+            Kozhikode, Kerala
+            <span aria-hidden="true" className="text-brand-line">·</span>
+            Caring since 1992
           </p>
 
-          <div className="rise mt-7 flex flex-wrap gap-3" style={{ animationDelay: "140ms" }}>
+          <h1 className="rise mt-6 max-w-[13ch] font-display text-display text-ink" style={rise(0.14)}>
+            Good medicine begins with <em className="text-brand italic">listening</em>.
+          </h1>
+
+          <p className="rise mt-6 max-w-[54ch] text-lede text-muted" style={rise(0.24)}>
+            120 consultants, 32 departments and 24-hour emergency care under one roof on the
+            Malabar coast — so the distance between a worry and an answer is a single visit.
+          </p>
+
+          <div className="rise mt-8 flex flex-wrap items-center gap-3" style={rise(0.34)}>
             <BookButton size="lg">
-              <CalendarCheck className="size-[1.15rem]" strokeWidth={ICON_STROKE} aria-hidden="true" />
               Book an appointment
+              <ArrowRight aria-hidden="true" className="size-4" />
             </BookButton>
-            <Link href="#doctors" className={buttonStyles("secondary", "lg", "group")}>
+            <a href="#doctors" className={buttonStyles("ghost", "lg")}>
               Find a doctor
-              <ArrowRight
-                className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
-                strokeWidth={ICON_STROKE}
-                aria-hidden="true"
-              />
-            </Link>
+            </a>
           </div>
 
-          <dl
-            className="rise mt-9 grid max-w-md grid-cols-3 gap-4 border-t border-brand-line pt-5"
-            style={{ animationDelay: "210ms" }}
-          >
-            {trustPoints.map((point) => (
-              <div key={point.label} className="flex flex-col gap-0.5">
-                <dt className="tabular font-display text-2xl text-brand">{point.figure}</dt>
-                <dd className="text-sm leading-snug text-muted">{point.label}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <div
-          className="rise relative lg:col-span-6 lg:col-start-7 xl:col-span-7"
-          style={{ animationDelay: "60ms" }}
-        >
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl sm:aspect-[16/10]">
-            <Image
-              src="/images/scenes/hero-consultation.jpg"
-              alt="A clinician examining an older patient during an outpatient consultation."
-              fill
-              priority
-              sizes="(min-width: 1280px) 56vw, (min-width: 1024px) 48vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-
-          {/* The one piece of layering in the hero: the emergency line, which is
-              the thing a worried visitor needs before anything else. */}
-          <a
-            href={hospital.phone.emergencyHref}
-            className="group absolute -bottom-5 left-4 flex items-center gap-3 rounded-xl bg-white p-3.5 pr-5 shadow-[var(--shadow-lift)] transition-transform duration-200 hover:-translate-y-0.5 motion-reduce:transition-none sm:left-6 lg:-left-6"
-          >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-              <ShieldPlus className="size-5" strokeWidth={ICON_STROKE} aria-hidden="true" />
+          <div className="rise mt-9 flex flex-wrap items-center gap-4" style={rise(0.44)}>
+            <span className="flex -space-x-3" aria-hidden="true">
+              {trustPortraits.map((doctor) => (
+                <span key={doctor.id} className="relative size-11 overflow-hidden rounded-full ring-2 ring-ground">
+                  <Image src={doctor.portrait} alt="" fill sizes="44px" className="object-cover" />
+                </span>
+              ))}
             </span>
-            <span className="min-w-0">
-              <span className="block text-sm text-muted">Emergency, open 24 hours</span>
-              <span className="tabular block font-medium text-ink group-hover:text-brand">
-                {hospital.phone.emergency}
+            <span className="flex flex-col">
+              <span className="flex items-center gap-1" aria-label="Rated 4.8 out of 5 by patients">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star key={index} aria-hidden="true" className="size-4 fill-teal text-teal" />
+                ))}
+                <span className="tabular ml-1 text-sm font-semibold text-ink">4.8</span>
               </span>
+              <span className="text-sm text-muted">from 4,900+ patient reviews this year</span>
             </span>
-          </a>
+          </div>
         </div>
+
+        {/* Arch portrait with floating cards */}
+        <div className="relative lg:col-span-5">
+          <div className="rise relative" style={rise(0.2)}>
+            <div aria-hidden="true" className="arch absolute inset-0 translate-x-4 translate-y-4 border-2 border-teal/45" />
+            <motion.div
+              style={{ y: imageY }}
+              className="arch relative aspect-[4/5] overflow-hidden bg-brand-tint shadow-lift"
+            >
+              <Image
+                src="/images/scenes/hero-consultation.jpg"
+                alt="A Santhi Hospital consultant sitting with an elderly patient during a consultation. Demonstration photograph."
+                fill
+                priority
+                sizes="(min-width: 1024px) 40vw, 92vw"
+                className="object-cover"
+              />
+            </motion.div>
+          </div>
+
+          {/* Next-available card */}
+          <div
+            className="rise float-soft absolute -bottom-6 left-4 max-w-[17rem] rounded-2xl border border-brand-line bg-white/95 p-4 shadow-lift backdrop-blur sm:left-0"
+            style={rise(0.55)}
+          >
+            <p className="label-sm text-muted">Next available</p>
+            <p className="mt-1 text-[0.9375rem] font-semibold text-ink">{featured.name}</p>
+            <p className="text-xs text-muted">{featured.role.split("—")[1]?.trim() ?? featured.role}</p>
+            <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-teal-tint px-3 py-1 text-xs font-medium text-teal-ink">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-teal" />
+              {featured.nextAvailable}
+            </p>
+          </div>
+
+          {/* Emergency card */}
+          <div
+            className="rise float-soft absolute top-6 right-4 rounded-2xl bg-ink p-4 text-white shadow-lift sm:right-0"
+            style={{ animationDelay: "0.7s" }}
+          >
+            <p className="label-sm flex items-center gap-2 text-ink-muted">
+              <span aria-hidden="true" className="pulse-dot size-2 rounded-full bg-accent" />
+              24/7 Emergency
+            </p>
+            <a
+              href={hospital.phone.emergencyHref}
+              className="tabular mt-1 block font-display text-lg text-white underline-offset-4 hover:underline"
+            >
+              {hospital.phone.emergency}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Brand ticker */}
+      <div className="relative border-y border-brand-ink/40 bg-brand py-3.5 text-white">
+        <Marquee items={tickerItems} />
       </div>
     </section>
   );
