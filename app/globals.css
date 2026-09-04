@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Santhi Hospital design tokens.
+
+   The palette is the one supplied with the brief, declared once here so no
+   component carries a raw hex value.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* Primary */
+  --color-brand: #413a97; /* the only brand colour that clears AA for body copy */
+  --color-brand-ink: #332d7c; /* hover / pressed */
+  --color-brand-tint: #e9e7f3;
+  --color-brand-wash: #f5f4fa;
+  --color-brand-line: #d5d2e7;
+
+  /* Accent — emergency only */
+  --color-accent: #ec1c24;
+  --color-accent-ink: #b31119;
+
+  /* Teal */
+  --color-teal: #42a3aa; /* decorative; fails contrast as small text on white */
+  --color-teal-ink: #004c59; /* readable teal */
+  --color-ink: #002726; /* dark sections and strong type */
+  --color-ink-soft: #14403e;
+  --color-ink-muted: #9db8b7;
+
+  /* Grounds — violet-biased, never a neutral grey */
+  --color-ground: #f1f0f6;
+  --color-ground-deep: #e4e2ee;
+  --color-paper: #efebe0;
+  --color-paper-line: #ddd6c6;
+  --color-muted: #5b5872;
+
+  /* Ribbon */
+  --color-ribbon-1: #3736af;
+  --color-ribbon-2: #4044c1;
+  --color-ribbon-3: #3e55bf;
+  --color-ribbon-4: #42a3aa;
+
+  /* Type */
+  --font-display: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: clamp(2.5rem, 5.4vw, 4.25rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.025em;
+
+  --text-headline: clamp(1.8rem, 3.4vw, 2.6rem);
+  --text-headline--line-height: 1.1;
+  --text-headline--letter-spacing: -0.02em;
+
+  --text-title: clamp(1.3rem, 2vw, 1.7rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.015em;
+
+  --text-lede: clamp(1.02rem, 1.2vw, 1.18rem);
+  --text-lede--line-height: 1.55;
+
+  /* Depth. Two levels only — a resting edge and a lifted state. */
+  --shadow-card: 0 1px 2px rgb(0 39 38 / 0.05), 0 8px 24px -12px rgb(0 39 38 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(0 39 38 / 0.06), 0 18px 40px -16px rgb(65 58 151 / 0.28);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: #ffffff;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: #ffffff;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+   --------------------------------------------------------------------------- */
+
+/** Section rhythm. Content sections stay compact; only the hero is generous. */
+@utility section-y {
+  padding-block: 3.5rem;
+  @media (width >= 1024px) {
+    padding-block: 5rem;
+  }
+}
+
+/** The campaign's indigo-to-teal sweep. */
+@utility ribbon-sweep {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-ribbon-1) 0%,
+    var(--color-ribbon-2) 32%,
+    var(--color-ribbon-3) 58%,
+    var(--color-ribbon-4) 100%
+  );
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/**
+ * Small functional label — a step counter, a field legend, a footer column head.
+ * Deliberately sentence case rather than a tracked-out all-caps eyebrow, which
+ * reads as template chrome when it sits above every heading on a page.
+ */
+@utility label-sm {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/** A faint grid, used to give dark and tinted panels some surface. */
+@utility field-grid {
+  background-image:
+    linear-gradient(to right, currentColor 1px, transparent 1px),
+    linear-gradient(to bottom, currentColor 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/**
+ * Above-the-fold entrance, in CSS so it plays on first paint without waiting for
+ * hydration and still runs for visitors without JavaScript.
+ */
+@keyframes santhi-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise {
+  animation: santhi-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
+
+/**
+ * Accordion open/close. Height has to animate for the panel to leave the flow,
+ * and the motion system keeps layout properties out of `animate` — so this one
+ * runs in CSS off the height Radix measures.
+ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="accordion-content"] {
+    animation: none !important;
+  }
+}
+
+/** Horizontal rails: hide the scrollbar, keep keyboard and touch scrolling. */
+@utility rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
