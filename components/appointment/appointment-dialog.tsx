@@ -140,7 +140,7 @@ export function AppointmentDialog({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60" />
         <Dialog.Content
           key={session}
-          className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
+          className="fixed inset-0 z-60 flex items-end justify-center sm:items-center sm:p-6"
         >
           <motion.div
             initial={{ opacity: 0, y: 28, scale: 0.985 }}
