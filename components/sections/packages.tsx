@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Preventive health check packages. One card is deliberately elevated ("most
- * chosen") rather than three identical ones — the choice is meant to be easy.
+ * chosen") rather than three identical ones — it sits a little higher on the
+ * row and carries the tint, so the choice is meant to be easy.
  */
 export function Packages() {
   return (
@@ -18,54 +19,49 @@ export function Packages() {
             kicker="Health checks"
             title={
               <>
-                Screening built around <em className="text-brand italic">you</em>, not a checklist.
+                Screening built around{" "}
+                <em className="font-semibold text-brand not-italic">you</em>, not a checklist.
               </>
             }
             lede="Three packages, each reviewed with a physician on the same day. No upselling between the blood draw and the report."
           />
         </Reveal>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid items-start gap-6 lg:grid-cols-3">
           {packages.map((pkg, index) => (
-            <Reveal key={pkg.id} index={index}>
+            <Reveal key={pkg.id} index={index} direction="up">
               <article
                 className={cn(
-                  "relative flex h-full flex-col rounded-3xl border p-8",
+                  "lift-card relative flex h-full flex-col rounded-3xl border p-8",
                   pkg.popular
-                    ? "border-ink bg-ink text-white shadow-lift"
-                    : "border-brand-line bg-white shadow-card",
+                    ? "border-brand bg-brand-tint shadow-lift lg:-translate-y-3"
+                    : "border-brand-line bg-white shadow-card hover:border-brand-soft",
                 )}
               >
                 {pkg.popular ? (
-                  <span className="absolute -top-3.5 right-6 rounded-full bg-teal px-3.5 py-1.5 text-xs font-semibold text-ink">
+                  <span className="absolute -top-3.5 right-6 rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white shadow-card">
                     Most chosen
                   </span>
                 ) : null}
 
-                <h3 className={cn("font-display text-xl", pkg.popular ? "text-white" : "text-ink")}>
-                  {pkg.name}
-                </h3>
-                <p className={cn("mt-1 text-sm", pkg.popular ? "text-ink-muted" : "text-muted")}>
-                  {pkg.for}
-                </p>
+                <h3 className="font-display text-xl font-medium text-ink">{pkg.name}</h3>
+                <p className="mt-1 text-sm text-muted">{pkg.for}</p>
 
                 <p className="mt-6 flex items-baseline gap-2">
                   <span
                     className={cn(
-                      "font-display text-[2.6rem] leading-none",
-                      pkg.popular ? "text-teal" : "text-brand",
+                      "font-display text-[2.6rem] leading-none font-medium",
+                      pkg.popular ? "text-brand-ink" : "text-brand",
                     )}
                   >
                     {pkg.price}
                   </span>
-                  <span className={cn("text-sm", pkg.popular ? "text-ink-muted" : "text-muted")}>
-                    all inclusive
-                  </span>
+                  <span className="text-sm text-muted">all inclusive</span>
                 </p>
                 <p
                   className={cn(
                     "mt-2 inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-medium",
-                    pkg.popular ? "bg-white/10 text-white" : "bg-brand-wash text-brand-ink",
+                    pkg.popular ? "bg-white/80 text-brand-ink" : "bg-brand-wash text-brand-ink",
                   )}
                 >
                   {pkg.duration}
@@ -74,11 +70,8 @@ export function Packages() {
                 <ul className="mt-6 flex flex-1 flex-col gap-2.5">
                   {pkg.includes.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-[0.9rem]">
-                      <Check
-                        aria-hidden="true"
-                        className={cn("mt-0.5 size-4 shrink-0", pkg.popular ? "text-teal" : "text-teal-ink")}
-                      />
-                      <span className={pkg.popular ? "text-white/90" : "text-ink-soft"}>{item}</span>
+                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-teal-ink" />
+                      <span className="text-ink-soft">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -86,7 +79,7 @@ export function Packages() {
                 <div className="mt-8">
                   <BookButton
                     departmentId="general-medicine"
-                    variant={pkg.popular ? "onDark" : "secondary"}
+                    variant={pkg.popular ? "primary" : "secondary"}
                     className="w-full"
                     ariaLabel={`Book the ${pkg.name} health check`}
                   >

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Figtree } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
 import { AppointmentProvider } from "@/components/appointment/appointment-provider";
@@ -7,18 +7,22 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 
-/** Editorial display serif — warm, characterful, with true italics for accents. */
-const fraunces = Fraunces({
+/**
+ * Display face — a geometric sans with wide apertures and a tall x-height, the
+ * closest open equivalent to the lettering on the hospital's campaign artwork.
+ * Used light at display sizes, medium everywhere else.
+ */
+const outfit = Outfit({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
-/** Interface and body face. */
-const figtree = Figtree({
+/** Interface and body face — the same geometry, tuned for small sizes. */
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-figtree",
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -67,13 +71,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#413a97",
+  themeColor: "#f5f9f9",
   colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={`${fraunces.variable} ${figtree.variable}`}>
+    <html lang="en-IN" className={`${outfit.variable} ${jakarta.variable}`}>
       <body className="min-h-screen antialiased">
         {/* Scroll-reveal wrappers start hidden and are animated in by motion.
             If JavaScript never arrives, this keeps every section readable. */}

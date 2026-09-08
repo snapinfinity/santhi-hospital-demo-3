@@ -14,7 +14,8 @@ export function Services() {
             kicker="Services"
             title={
               <>
-                Everything <em className="text-brand italic">around</em> the consultation.
+                Everything <em className="font-semibold text-brand not-italic">around</em> the
+                consultation.
               </>
             }
             lede="Diagnostics, pharmacy, rehabilitation and follow-up at home — the parts of care that decide whether a treatment plan actually happens."
@@ -25,14 +26,14 @@ export function Services() {
           {services.map((service, index) => {
             const Icon = serviceIcons[service.icon];
             return (
-              <Reveal key={service.id} index={index % 4} as="li">
-                <article className="group flex h-full flex-col rounded-2xl border border-brand-line bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+              <Reveal key={service.id} index={index % 4} as="li" direction="up">
+                <article className="lift-card group flex h-full flex-col rounded-2xl border border-brand-line bg-white p-6 hover:border-brand-soft hover:shadow-lift">
                   {Icon ? (
-                    <span className="grid size-12 place-items-center rounded-xl bg-brand-tint text-brand">
+                    <span className="grid size-12 place-items-center rounded-xl bg-brand-tint text-brand transition-transform duration-500 ease-out group-hover:-translate-y-1">
                       <Icon aria-hidden="true" strokeWidth={ICON_STROKE} className="size-6" />
                     </span>
                   ) : null}
-                  <h3 className="mt-5 font-display text-lg text-ink">{service.name}</h3>
+                  <h3 className="mt-5 font-display text-lg font-medium text-ink">{service.name}</h3>
                   <p className="mt-2 flex-1 text-[0.9rem] leading-relaxed text-muted">
                     {service.description}
                   </p>
@@ -40,7 +41,7 @@ export function Services() {
                     {service.detail}
                     <ArrowRight
                       aria-hidden="true"
-                      className="size-4 transition-transform group-hover:translate-x-1"
+                      className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1"
                     />
                   </p>
                 </article>

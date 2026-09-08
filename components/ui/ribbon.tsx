@@ -1,7 +1,11 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
+import { motionTokens } from "@/lib/motion-tokens";
 import { cn } from "@/lib/utils";
 
 /**
- * The campaign's indigo-to-teal sweep, rebuilt as CSS and SVG so it costs one
+ * The campaign's teal-to-mint sweep, rebuilt as CSS and SVG so it costs one
  * gradient rather than an image. The gradient is declared once per document and
  * referenced by id, which keeps repeated arcs free of duplicated <defs>.
  */
@@ -20,9 +24,37 @@ export function RibbonDefs() {
   );
 }
 
-/** A thin ribbon rule — the section divider used in place of a plain hairline. */
-export function RibbonRule({ className }: { className?: string }) {
-  return <div aria-hidden="true" className={cn("ribbon-sweep h-px w-full", className)} />;
+/**
+ * A thin ribbon rule — the section divider used in place of a plain hairline.
+ * It draws itself from the left as it comes into view, which gives a heading
+ * block a moving element without animating the words.
+ */
+export function RibbonRule({
+  className,
+  delay = 0,
+  thick = false,
+}: {
+  className?: string;
+  delay?: number;
+  /** A 3px rule, for the one place a section rests its whole structure on it. */
+  thick?: boolean;
+}) {
+  const reduce = useReducedMotion();
+
+  return (
+    <motion.div
+      aria-hidden="true"
+      className={cn("ribbon-sweep w-full origin-left", thick ? "h-[3px]" : "h-px", className)}
+      initial={reduce ? { opacity: 0 } : { scaleX: 0, opacity: 0 }}
+      whileInView={{ scaleX: 1, opacity: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{
+        duration: reduce ? motionTokens.duration.fast : motionTokens.duration.crawl,
+        ease: motionTokens.easing.glide,
+        delay,
+      }}
+    />
+  );
 }
 
 /**

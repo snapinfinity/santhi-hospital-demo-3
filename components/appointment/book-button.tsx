@@ -1,9 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
 import { buttonStyles, type ButtonSize, type ButtonVariant } from "@/components/ui/button";
-import { motionTokens, springs } from "@/lib/motion-tokens";
 import { useAppointment, type BookingPrefill } from "./appointment-provider";
 
 type BookButtonProps = BookingPrefill & {
@@ -15,7 +13,13 @@ type BookButtonProps = BookingPrefill & {
   ariaLabel?: string;
 };
 
-/** Every appointment entry point on the page routes through this button. */
+/**
+ * Every appointment entry point on the page routes through this button.
+ *
+ * The hover lift and press come from the shared `btn-motion` utility rather
+ * than a motion component, so a link styled with `buttonStyles` and a booking
+ * button move in exactly the same way.
+ */
 export function BookButton({
   children,
   departmentId,
@@ -26,19 +30,15 @@ export function BookButton({
   ariaLabel,
 }: BookButtonProps) {
   const { openBooking } = useAppointment();
-  const reduce = useReducedMotion();
 
   return (
-    <motion.button
+    <button
       type="button"
       aria-label={ariaLabel}
       onClick={() => openBooking({ departmentId, doctorId })}
       className={buttonStyles(variant, size, className)}
-      whileHover={reduce ? undefined : { scale: motionTokens.scale.pop }}
-      whileTap={reduce ? undefined : { scale: motionTokens.scale.press }}
-      transition={springs.snappy}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }

@@ -1,23 +1,25 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "onDark" | "emergency";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "emergency";
 export type ButtonSize = "md" | "lg";
 
 /**
  * Note: `base` sets `inline-flex`, so passing a `hidden` utility through
  * `className` will not hide the button — the two are the same kind of utility
  * and `inline-flex` wins. Put responsive visibility on a wrapper element.
+ *
+ * `btn-motion` carries the interaction: colour transitions for everyone, and a
+ * 2px lift plus a press that are dropped under reduced motion.
  */
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-150 " +
+  "btn-motion inline-flex items-center justify-center gap-2 rounded-full font-medium " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-white hover:bg-brand-ink",
+  primary: "bg-brand text-white hover:bg-brand-ink hover:shadow-lift",
   secondary: "border border-brand-line bg-white text-brand hover:border-brand hover:bg-brand-tint",
   ghost: "text-brand hover:bg-brand-tint",
-  onDark: "bg-white text-ink hover:bg-ground",
   emergency: "bg-accent text-white hover:bg-accent-ink",
 };
 

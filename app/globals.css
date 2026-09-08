@@ -1,74 +1,89 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Santhi Hospital — "Editorial Arch" design system.
+   Santhi Hospital — "Soft Teal" design system.
 
-   The palette is carried over from the hospital's brand and declared once
-   here so no component carries a raw hex value. Contrast rules:
-   - #413a97 is the only brand colour that clears AA for body copy.
-   - #ec1c24 is limited to emergency indicators.
-   - #42a3aa is decorative only; #004c59 carries any teal text.
+   The palette is drawn from the light end of the hospital's campaign artwork:
+   the pale mint and aqua tints, the warm white card, the single teal the
+   headline is set in. The deep navy-teal of the poster ground is deliberately
+   absent — it survives only as the ink colour used for type, never as a
+   surface. Contrast rules:
+   - #14717c is the working teal: 5.7:1 on white, safe for body copy.
+   - #16786a is the mint-side text colour: 5.3:1 on white.
+   - #3fae97 and #9fced3 are decorative only and never carry text.
+   - #e0353c is limited to emergency indicators.
    --------------------------------------------------------------------------- */
 
 @theme {
-  /* Primary */
-  --color-brand: #413a97;
-  --color-brand-ink: #332d7c;
-  --color-brand-tint: #e9e7f3;
-  --color-brand-wash: #f5f4fa;
-  --color-brand-line: #d5d2e7;
+  /* Primary — teal */
+  --color-brand: #14717c;
+  --color-brand-ink: #0d5a64;
+  --color-brand-tint: #d5e9ea;
+  --color-brand-wash: #eaf4f4;
+  --color-brand-line: #cbe2e4;
+  --color-brand-soft: #9fced3;
 
   /* Accent — emergency only */
-  --color-accent: #ec1c24;
-  --color-accent-ink: #b31119;
+  --color-accent: #e0353c;
+  --color-accent-ink: #b21f27;
+  --color-accent-wash: #fdeeee;
+  --color-accent-line: #f4d3d4;
 
-  /* Teal */
-  --color-teal: #42a3aa;
-  --color-teal-tint: #e0efef;
-  --color-teal-ink: #004c59;
-  --color-ink: #002726;
-  --color-ink-soft: #14403e;
-  --color-ink-muted: #9db8b7;
+  /* Mint — the green end of the campaign sweep */
+  --color-teal: #3fae97;
+  --color-teal-tint: #e3f4ef;
+  --color-teal-ink: #16786a;
 
-  /* Grounds — violet-biased and warm, never a neutral grey */
-  --color-ground: #f3f2f8;
-  --color-ground-deep: #e6e4f0;
-  --color-paper: #fbf9f4;
-  --color-paper-line: #e5dfd1;
-  --color-muted: #5b5872;
+  /* Ink — deep teal-slate. Type and hairlines only, never a ground. */
+  --color-ink: #123239;
+  --color-ink-soft: #37585f;
 
-  /* Ribbon */
-  --color-ribbon-1: #3736af;
-  --color-ribbon-2: #4044c1;
-  --color-ribbon-3: #3e55bf;
-  --color-ribbon-4: #42a3aa;
+  /* Grounds — pale, luminous, faintly cool */
+  --color-ground: #f5f9f9;
+  --color-ground-deep: #e2eff0;
+  --color-paper: #fbfaf6;
+  --color-paper-line: #e6edec;
+  --color-muted: #566e73;
+
+  /* Ribbon — the campaign's teal-to-mint sweep */
+  --color-ribbon-1: #0f6f79;
+  --color-ribbon-2: #157f84;
+  --color-ribbon-3: #23988c;
+  --color-ribbon-4: #3fae97;
 
   /* Type */
-  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: clamp(2.6rem, 5.8vw, 4.75rem);
-  --text-display--line-height: 1.02;
-  --text-display--letter-spacing: -0.025em;
+  --text-display: clamp(2.6rem, 5.8vw, 4.65rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 400;
 
   --text-headline: clamp(1.85rem, 3.4vw, 2.7rem);
-  --text-headline--line-height: 1.08;
-  --text-headline--letter-spacing: -0.02em;
+  --text-headline--line-height: 1.12;
+  --text-headline--letter-spacing: -0.025em;
+  --text-headline--font-weight: 500;
 
   --text-title: clamp(1.3rem, 2vw, 1.7rem);
-  --text-title--line-height: 1.2;
-  --text-title--letter-spacing: -0.015em;
+  --text-title--line-height: 1.24;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 500;
 
   --text-lede: clamp(1.02rem, 1.2vw, 1.18rem);
-  --text-lede--line-height: 1.55;
+  --text-lede--line-height: 1.6;
 
   --text-mega: clamp(4rem, 15vw, 13rem);
   --text-mega--line-height: 0.9;
-  --text-mega--letter-spacing: -0.04em;
+  --text-mega--letter-spacing: -0.045em;
 
   /* Depth. Two levels only — a resting edge and a lifted state. */
-  --shadow-card: 0 1px 2px rgb(0 39 38 / 0.05), 0 8px 24px -12px rgb(0 39 38 / 0.14);
-  --shadow-lift: 0 2px 4px rgb(0 39 38 / 0.06), 0 18px 40px -16px rgb(65 58 151 / 0.3);
+  --shadow-card: 0 1px 2px rgb(18 50 57 / 0.04), 0 10px 28px -14px rgb(18 50 57 / 0.16);
+  --shadow-lift: 0 2px 6px rgb(18 50 57 / 0.05), 0 22px 46px -18px rgb(20 113 124 / 0.28);
+
+  /* Motion — one easing pair for the whole site. */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-glide: cubic-bezier(0.33, 0.9, 0.28, 1);
 }
 
 /* ---------------------------------------------------------------------------
@@ -111,10 +126,6 @@
     border-radius: 2px;
   }
 
-  .on-dark :focus-visible {
-    outline-color: #ffffff;
-  }
-
   ::selection {
     background-color: var(--color-brand);
     color: #ffffff;
@@ -133,7 +144,7 @@
   }
 }
 
-/** The campaign's indigo-to-teal sweep. */
+/** The campaign's teal-to-mint sweep, used for rules and the progress bar. */
 @utility ribbon-sweep {
   background-image: linear-gradient(
     100deg,
@@ -141,6 +152,17 @@
     var(--color-ribbon-2) 32%,
     var(--color-ribbon-3) 58%,
     var(--color-ribbon-4) 100%
+  );
+}
+
+/** The same sweep at wash strength — a tinted ground that still takes ink type. */
+@utility wash-sweep {
+  background-image: linear-gradient(
+    105deg,
+    #d9edec 0%,
+    #cfe6ea 38%,
+    #d1eae0 68%,
+    #ddf2e8 100%
   );
 }
 
@@ -155,7 +177,7 @@
   line-height: 1.3;
 }
 
-/** A faint grid, used to give dark and tinted panels some surface. */
+/** A faint grid, used to give tinted panels some surface. */
 @utility field-grid {
   background-image:
     linear-gradient(to right, currentColor 1px, transparent 1px),
@@ -174,6 +196,24 @@
   border-start-end-radius: 3rem;
 }
 
+/** Horizontal rails: hide the scrollbar, keep keyboard and touch scrolling. */
+@utility rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+
+   Everything here is movement: short travel, slow curves, nothing that spins
+   or flashes. Hover states move 2-5px; ambient loops take twenty seconds or
+   more to complete a cycle. The reduced-motion block at the end switches the
+   whole movement layer off in one place.
+   --------------------------------------------------------------------------- */
+
 /**
  * Above-the-fold entrance, in CSS so it plays on first paint without waiting
  * for hydration and still runs for visitors without JavaScript.
@@ -181,7 +221,7 @@
 @keyframes santhi-rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translate3d(0, 22px, 0);
   }
   to {
     opacity: 1;
@@ -190,77 +230,154 @@
 }
 
 @utility rise {
-  animation: santhi-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: santhi-rise 0.9s var(--ease-soft) backwards;
+}
+
+/** The hero portrait settles in from a slightly wider crop. */
+@keyframes santhi-settle {
+  from {
+    opacity: 0;
+    transform: scale(1.06) translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility settle {
+  animation: santhi-settle 1.4s var(--ease-glide) backwards;
 }
 
 /** Endless horizontal ticker. The track holds two copies of its content. */
 @keyframes marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 @utility marquee-track {
-  animation: marquee 38s linear infinite;
+  animation: marquee 44s linear infinite;
 }
 
-/** Gentle floating for hero badge cards. */
+/** Gentle floating for the hero's badge cards. */
 @keyframes float-soft {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translateY(-9px);
+    transform: translate3d(0, -8px, 0);
   }
 }
 
 @utility float-soft {
-  animation: float-soft 7s ease-in-out infinite;
+  animation: float-soft 8s ease-in-out infinite;
+}
+
+/** Ambient wash drift — two paths, so neighbouring shapes never move in step. */
+@keyframes drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(20px, -26px, 0) scale(1.06);
+  }
+}
+
+@keyframes drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-22px, 18px, 0) scale(0.95);
+  }
+}
+
+@utility drift-a {
+  animation: drift-a 24s ease-in-out infinite;
+}
+
+@utility drift-b {
+  animation: drift-b 30s ease-in-out infinite;
 }
 
 /** Expanding ring for the live emergency dot. */
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgb(236 28 36 / 0.5);
+    box-shadow: 0 0 0 0 rgb(224 53 60 / 0.45);
   }
   70% {
-    box-shadow: 0 0 0 9px rgb(236 28 36 / 0);
+    box-shadow: 0 0 0 9px rgb(224 53 60 / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgb(236 28 36 / 0);
+    box-shadow: 0 0 0 0 rgb(224 53 60 / 0);
   }
 }
 
 @utility pulse-dot {
-  animation: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .rise,
-  .marquee-track,
-  .float-soft,
-  .pulse-dot {
-    animation: none !important;
+/**
+ * Buttons. Colour transitions stay for everyone; the 2px lift and the press
+ * are the movement layer, dropped under reduced motion.
+ */
+@utility btn-motion {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s var(--ease-soft);
+  &:hover {
+    transform: translate3d(0, -2px, 0);
+  }
+  &:active {
+    transform: translate3d(0, 0, 0) scale(0.985);
+  }
+}
+
+/** Cards that lift towards the reader on hover. */
+@utility lift-card {
+  transition:
+    transform 0.4s var(--ease-soft),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+  &:hover {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+/** Rows that step sideways instead of lifting. */
+@utility slide-row {
+  transition:
+    transform 0.4s var(--ease-soft),
+    background-color 0.3s ease;
+  &:hover {
+    transform: translate3d(4px, 0, 0);
   }
 }
 
 /**
  * Accordion open/close. Height has to animate for the panel to leave the flow,
- * and the motion system keeps layout properties out of `animate` — so this one
- * runs in CSS off the height Radix measures.
+ * so this one runs in CSS off the height Radix measures.
  */
 @keyframes accordion-down {
   from {
     height: 0;
     opacity: 0;
+    transform: translate3d(0, -6px, 0);
   }
   to {
     height: var(--radix-accordion-content-height);
     opacity: 1;
+    transform: none;
   }
 }
 
@@ -268,24 +385,32 @@
   from {
     height: var(--radix-accordion-content-height);
     opacity: 1;
+    transform: none;
   }
   to {
     height: 0;
     opacity: 0;
+    transform: translate3d(0, -6px, 0);
   }
 }
 
+/* One place to switch the movement layer off. */
 @media (prefers-reduced-motion: reduce) {
+  .rise,
+  .settle,
+  .marquee-track,
+  .float-soft,
+  .drift-a,
+  .drift-b,
+  .pulse-dot,
   [data-slot="accordion-content"] {
     animation: none !important;
   }
-}
 
-/** Horizontal rails: hide the scrollbar, keep keyboard and touch scrolling. */
-@utility rail {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
+  .btn-motion:hover,
+  .btn-motion:active,
+  .lift-card:hover,
+  .slide-row:hover {
+    transform: none !important;
   }
 }

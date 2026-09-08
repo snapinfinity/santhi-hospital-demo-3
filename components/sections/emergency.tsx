@@ -8,38 +8,46 @@ const readiness = [
   "Direct lift access to imaging, theatres and intensive care",
 ];
 
-/** The one red-accented section. Emergencies get the loudest voice on the page. */
+/**
+ * The one red-accented section. The ground is a blush wash rather than a solid
+ * red block — the urgency is carried by the number and the live dot, which is
+ * where a visitor in a hurry is actually looking.
+ */
 export function Emergency() {
   return (
-    <section id="emergency" className="bg-accent text-white">
+    <section
+      id="emergency"
+      className="border-y border-accent-line bg-accent-wash text-ink"
+    >
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.5fr_1fr] lg:py-16">
-        <Reveal>
-          <h2 className="font-display text-headline">
-            In an emergency, <em className="italic">minutes</em> matter.
+        <Reveal direction="right">
+          <h2 className="font-display text-headline text-ink">
+            In an emergency,{" "}
+            <em className="font-semibold text-accent-ink not-italic">minutes</em> matter.
           </h2>
-          <p className="mt-4 max-w-[58ch] text-[1.02rem] leading-relaxed text-white/90">
+          <p className="mt-4 max-w-[58ch] text-[1.02rem] leading-relaxed text-muted">
             No appointment, no formality — walk in, or call and we will meet you at the door. The
             Emergency &amp; Trauma Centre runs on its own corridor, its own lifts and its own team.
           </p>
           <ul className="mt-7 flex flex-col gap-3">
             {readiness.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-[0.95rem] text-white/95">
-                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+              <li key={item} className="flex items-start gap-3 text-[0.95rem] text-ink-soft">
+                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-accent" />
                 {item}
               </li>
             ))}
           </ul>
         </Reveal>
 
-        <Reveal index={1}>
-          <div className="rounded-3xl bg-white p-8 text-ink shadow-lift">
+        <Reveal direction="left" index={1}>
+          <div className="lift-card rounded-3xl border border-accent-line bg-white p-8 text-ink shadow-card hover:shadow-lift">
             <p className="label-sm flex items-center gap-2.5 text-muted">
               <span aria-hidden="true" className="pulse-dot size-2.5 rounded-full bg-accent" />
               Emergency &amp; ambulance — open 24 hours
             </p>
             <a
               href={hospital.phone.emergencyHref}
-              className="tabular mt-3 block font-display text-[2.6rem] leading-none text-accent-ink underline-offset-4 hover:underline"
+              className="tabular mt-3 block font-display text-[2.6rem] leading-none font-medium text-accent-ink underline-offset-4 hover:underline"
             >
               {hospital.phone.emergency}
             </a>
@@ -49,7 +57,7 @@ export function Emergency() {
             </p>
             <a
               href={hospital.phone.emergencyHref}
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 font-medium text-white transition-colors hover:bg-accent-ink"
+              className="btn-motion mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 font-medium text-white hover:bg-accent-ink"
             >
               <Phone aria-hidden="true" className="size-4" />
               Call for an ambulance

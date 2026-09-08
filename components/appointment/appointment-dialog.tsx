@@ -137,7 +137,7 @@ export function AppointmentDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/60" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/45 backdrop-blur-sm" />
         <Dialog.Content
           key={session}
           className="fixed inset-0 z-60 flex items-end justify-center sm:items-center sm:p-6"
@@ -150,7 +150,7 @@ export function AppointmentDialog({
           >
             <div className="flex items-center justify-between gap-4 border-b border-paper-line px-6 py-4 sm:px-8">
               <div>
-                <Dialog.Title className="font-display text-xl text-ink">
+                <Dialog.Title className="font-display font-medium text-xl text-ink">
                   {step === 4 ? "You are booked in" : "Book an appointment"}
                 </Dialog.Title>
                 <Dialog.Description className="label-sm mt-0.5 text-muted">
@@ -175,8 +175,8 @@ export function AppointmentDialog({
                         aria-current={state === "active" ? "step" : undefined}
                         className={cn(
                           "grid size-7 shrink-0 place-items-center rounded-full border text-xs font-semibold tabular transition-colors",
-                          state === "done" && "border-brand bg-brand text-white",
-                          state === "active" && "border-ink bg-ink text-white",
+                          state === "done" && "border-brand bg-brand-tint text-brand",
+                          state === "active" && "border-brand bg-brand text-white shadow-card",
                           state === "todo" && "border-paper-line bg-white text-muted",
                         )}
                       >
@@ -203,7 +203,7 @@ export function AppointmentDialog({
               {/* Step 0 — department */}
               {step === 0 ? (
                 <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth }}>
-                  <h3 className="mb-1 font-display text-lg text-ink">Which department?</h3>
+                  <h3 className="mb-1 font-display font-medium text-lg text-ink">Which department?</h3>
                   <p className="mb-5 text-sm text-muted">
                     Not sure? General Medicine is the right first stop — its physicians refer
                     onwards the same day.
@@ -216,7 +216,7 @@ export function AppointmentDialog({
                           key={item.id}
                           type="button"
                           onClick={() => pickDepartment(item.id)}
-                          className="flex min-h-14 items-center gap-3 rounded-xl border border-paper-line bg-white px-4 py-3 text-left transition-all hover:border-brand hover:shadow-card"
+                          className="flex min-h-14 items-center gap-3 rounded-xl border border-paper-line bg-white px-4 py-3 text-left lift-card hover:border-brand hover:shadow-card"
                         >
                           {Icon ? (
                             <Icon aria-hidden="true" strokeWidth={ICON_STROKE} className="size-5 shrink-0 text-brand" />
@@ -242,7 +242,7 @@ export function AppointmentDialog({
                   >
                     <ChevronLeft aria-hidden="true" className="size-4" /> All departments
                   </button>
-                  <h3 className="mb-1 font-display text-lg text-ink">
+                  <h3 className="mb-1 font-display font-medium text-lg text-ink">
                     Who would you like to see in {department.name}?
                   </h3>
                   <p className="mb-5 text-sm text-muted">
@@ -255,7 +255,7 @@ export function AppointmentDialog({
                         key={item.id}
                         type="button"
                         onClick={() => pickDoctor(item.id)}
-                        className="flex min-h-16 items-center gap-4 rounded-xl border border-paper-line bg-white px-4 py-3 text-left transition-all hover:border-brand hover:shadow-card"
+                        className="flex min-h-16 items-center gap-4 rounded-xl border border-paper-line bg-white px-4 py-3 text-left lift-card hover:border-brand hover:shadow-card"
                       >
                         <span className="relative size-12 shrink-0 overflow-hidden rounded-full bg-brand-tint">
                           <Image
@@ -296,12 +296,12 @@ export function AppointmentDialog({
                       <Image src={doctor.portrait} alt="" fill sizes="56px" className="object-cover" />
                     </span>
                     <span>
-                      <span className="block font-display text-lg text-ink">{doctor.name}</span>
+                      <span className="block font-display font-medium text-lg text-ink">{doctor.name}</span>
                       <span className="block text-sm text-muted">{department.name}</span>
                     </span>
                   </div>
 
-                  <h3 className="mb-3 font-display text-lg text-ink">Pick a day</h3>
+                  <h3 className="mb-3 font-display font-medium text-lg text-ink">Pick a day</h3>
                   <div className="rail -mx-1 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Available days">
                     {availability.map((item) => (
                       <button
@@ -313,7 +313,7 @@ export function AppointmentDialog({
                         className={cn(
                           "min-h-11 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                           day?.iso === item.iso
-                            ? "border-ink bg-ink text-white"
+                            ? "border-brand bg-brand text-white"
                             : "border-paper-line bg-white text-ink hover:border-brand",
                         )}
                       >
@@ -325,7 +325,7 @@ export function AppointmentDialog({
                   {day ? (
                     day.slots.length > 0 ? (
                       <>
-                        <h3 className="mt-6 mb-3 font-display text-lg text-ink">Pick a time</h3>
+                        <h3 className="mt-6 mb-3 font-display font-medium text-lg text-ink">Pick a time</h3>
                         <div className="flex flex-wrap gap-2">
                           {day.slots.map((time) => (
                             <button
@@ -467,12 +467,12 @@ export function AppointmentDialog({
                   <motion.span
                     initial={{ scale: 0.6, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ ...springs.bouncy, delay: 0.1 }}
+                    transition={{ ...springs.gentle, delay: 0.1 }}
                     className="grid size-16 place-items-center rounded-full bg-brand text-white"
                   >
                     <Check aria-hidden="true" className="size-8" />
                   </motion.span>
-                  <h3 className="mt-5 font-display text-2xl text-ink">
+                  <h3 className="mt-5 font-display font-medium text-2xl text-ink">
                     See you soon, {name.trim().split(/\s+/)[0]}.
                   </h3>
                   <p className="mt-2 max-w-[46ch] text-[0.95rem] text-muted">
