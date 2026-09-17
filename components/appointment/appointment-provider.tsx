@@ -10,6 +10,8 @@ export type BookingPrefill = {
 
 type AppointmentContextValue = {
   openBooking: (prefill?: BookingPrefill) => void;
+  /** True while the dialog is up — lets moving content on the page hold still behind it. */
+  bookingOpen: boolean;
 };
 
 const AppointmentContext = createContext<AppointmentContextValue | null>(null);
@@ -31,7 +33,7 @@ export function AppointmentProvider({ children }: { children: ReactNode }) {
     setOpen(true);
   }, []);
 
-  const value = useMemo(() => ({ openBooking }), [openBooking]);
+  const value = useMemo(() => ({ openBooking, bookingOpen: open }), [openBooking, open]);
 
   return (
     <AppointmentContext.Provider value={value}>

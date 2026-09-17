@@ -47,8 +47,8 @@ export function Insights() {
             <article className="lift-card group flex h-full flex-col overflow-hidden rounded-3xl border border-brand-line bg-white shadow-card hover:shadow-lift">
               <ZoomFrame className="aspect-[16/9] bg-brand-tint">
                 <Image
-                  src="/images/scenes/desk-consult.jpg"
-                  alt="A consultant talking a patient through their results at a desk. Demonstration photograph."
+                  src="/images/santhi/diagnostics-lab.jpg"
+                  alt="A technician at work in the Santhi Hospital diagnostics laboratory."
                   fill
                   sizes="(min-width: 1024px) 56vw, 92vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"

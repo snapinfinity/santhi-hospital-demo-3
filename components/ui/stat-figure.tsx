@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { motionTokens } from "@/lib/motion-tokens";
+import { cn } from "@/lib/utils";
 
 /** useLayoutEffect warns during SSR; fall back to useEffect on the server. */
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -47,12 +48,10 @@ export function StatFigure({ value, className }: { value: string; className?: st
     return () => controls.stop();
   }, [inView, shouldCount, target, suffix]);
 
+  // Tabular digits keep the figure from jittering as it counts; the width
+  // only ever grows towards the final value, so nothing needs reserving.
   return (
-    <span
-      ref={ref}
-      className={className}
-      style={{ minWidth: `${value.length}ch`, display: "inline-block" }}
-    >
+    <span ref={ref} className={cn("tabular inline-block", className)}>
       {display}
     </span>
   );

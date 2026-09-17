@@ -46,7 +46,7 @@ export function Testimonials() {
 
   return (
     <section className="relative overflow-hidden bg-brand-wash section-y">
-      <RibbonArc className="drift-a absolute -right-20 -bottom-10 h-[24rem] w-[40rem] opacity-[0.08]" strokeWidth={40} />
+      <RibbonArc className="absolute -right-20 -bottom-10 h-[24rem] w-[40rem] opacity-[0.08]" strokeWidth={40} />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <Reveal>

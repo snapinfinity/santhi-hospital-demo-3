@@ -41,13 +41,17 @@ the department index, the doctor roster (filtering), and the booking flow.
 
 ## Design decisions worth knowing
 
-**Colour.** The supplied palette is declared once in `app/globals.css` under `@theme`; no component
-carries a raw hex value. Contrast governs where each colour may appear: `#413A97` is the only brand
-colour that clears AA for body copy, `#EC1C24` is limited to emergency indicators, and
-`#42A3AA` is decorative only — `#004C59` carries any teal text.
+**Colour.** The palette follows the colours on santhihospital.com — a bright turquoise-green
+(`#1cba9f`) and a deep navy (`#223a66`) on a cool white ground — declared once in `app/globals.css`
+under `@theme`; no component carries a raw hex value. Contrast governs where each colour may appear:
+the turquoise only reaches 2.5:1 on white, so `#0b7d6a` (the same hue, darkened to 5.1:1) carries
+buttons and text, `#1cba9f` is decorative on light grounds and carries text only on navy, and
+`#e0353c` is limited to emergency indicators.
 
-**The PDF supplied the palette and nothing else.** Campaign photography, copy and compositions were
-not taken from it. Imagery is sourced separately and stored locally.
+**Imagery is the hospital's own.** The hero, the About frame and the featured article use
+photographs from santhihospital.com — the campus gate with the mobile ICU, the dialysis unit and
+the diagnostics laboratory — cropped and re-encoded into `public/images/santhi/`. They are demo
+assets; the site only borrows the colours and photographs, never the layout.
 
 **Portraits are art-directed, not just collected.** The twelve consultant portraits come from
 several different shoots, with backdrops ranging from strong red to magenta to outdoors — which
@@ -59,14 +63,20 @@ commissioned set. Mean saturation across the set went from 0.06–0.51 to 0.07�
 so alt text says exactly that — "Portrait used to represent Dr X… Demonstration image" — rather than
 asserting the person pictured is the person named.
 
-**The doctor roster is a filterable grid, not a carousel.** A grid cannot scroll sideways out of its
-container, so the overflow that affected the previous rail cannot recur; every card stays whole at
-every width and the whole list is reachable without dragging. Eight cards show initially, with the
-rest behind one control, which keeps the section from dominating the page.
+**The doctor roster is a single-row carousel.** The rail is a native horizontal scroller with
+mandatory snap points — touch swiping, trackpad scrolling and keyboard focus all work without a
+library — and the arrow buttons page it by however many whole cards are visible: four on a
+desktop, three on a laptop, two on a tablet, one and a peek on a phone. A progress track mirrors
+the rail and the arrows disable at either end. Filtering by department replaces the rail.
 
 **Icons carry hierarchy, not decoration.** One set (lucide) at one stroke weight, mapped centrally in
 `lib/icons.ts`. They appear where they speed up scanning — department lists, service indexes, contact
 details — and never beside prose. All 96 are `aria-hidden` because each sits next to a text label.
+
+**The hero is a full-bleed photograph.** The copy sits directly on the campus picture under two
+scrims: a horizontal sweep that is near-solid navy behind the headline and thins to almost nothing
+over the building, and a fade along the foot for the cards. Below `lg` the copy runs longer than
+the viewport, so the picture becomes a band across the top that dissolves into the navy ground.
 
 **No eyebrow labels.** A tracked-out all-caps caption above every heading is template chrome; the
 headings say what each section is. `SectionHeading` still accepts a `kicker` for the rare line that

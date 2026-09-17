@@ -102,7 +102,7 @@ export function Contact() {
               />
               <div
                 aria-hidden="true"
-                className="drift-b pointer-events-none absolute -bottom-20 -left-10 size-[20rem] rounded-full bg-white/60 blur-3xl"
+                className="wash-white drift-b pointer-events-none absolute -bottom-20 -left-10 size-[24rem] rounded-full"
               />
               <div className="relative">
                 <h3 className="font-display text-xl font-medium text-ink">Getting here</h3>
@@ -117,7 +117,7 @@ export function Contact() {
                   ))}
                 </ul>
 
-                <div className="mt-8 rounded-2xl border border-brand-line bg-white/70 p-5 backdrop-blur">
+                <div className="mt-8 rounded-2xl border border-brand-line bg-white/70 p-5">
                   <p className="label-sm flex items-center gap-2 text-teal-ink">
                     <miscIcons.MapPin aria-hidden="true" className="size-4" />
                     Landmark

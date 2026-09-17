@@ -17,7 +17,7 @@ export function Cta() {
             />
             <div
               aria-hidden="true"
-              className="drift-a pointer-events-none absolute -top-24 -right-16 size-[22rem] rounded-full bg-white/50 blur-3xl"
+              className="wash-white drift-a pointer-events-none absolute -top-24 -right-16 size-[26rem] rounded-full"
             />
             <div className="relative flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div>

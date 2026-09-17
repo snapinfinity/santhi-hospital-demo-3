@@ -47,10 +47,10 @@ export function SiteHeader() {
   return (
     <>
       {/* Utility strip — emergency access is reachable before anything else. */}
-      <div className="border-b border-brand-line bg-brand-wash text-ink-soft">
+      <div className="bg-navy text-white/80">
         <div className="mx-auto flex h-10 max-w-7xl items-center justify-between gap-4 px-4 text-[0.8rem] sm:px-6">
-          <p className="flex min-w-0 items-center gap-2 text-muted">
-            <MapPin aria-hidden="true" className="size-3.5 shrink-0 text-teal-ink" />
+          <p className="flex min-w-0 items-center gap-2">
+            <MapPin aria-hidden="true" className="size-3.5 shrink-0 text-teal" />
             <span className="truncate">
               Eranhipalam, Kozhikode
               <span className="hidden sm:inline"> · OP: Mon–Sat, 8 AM – 8 PM</span>
@@ -58,11 +58,11 @@ export function SiteHeader() {
           </p>
           <a
             href={hospital.phone.emergencyHref}
-            className="flex min-h-11 shrink-0 items-center gap-2.5 py-2 font-medium whitespace-nowrap text-ink transition-colors duration-200 hover:text-accent-ink"
+            className="flex min-h-11 shrink-0 items-center gap-2.5 py-2 font-medium whitespace-nowrap text-white/85 transition-colors duration-200 hover:text-teal-bright"
           >
             <span aria-hidden="true" className="pulse-dot size-2 rounded-full bg-accent" />
             <span className="hidden sm:inline">24/7 Emergency</span>
-            <span className="tabular text-accent-ink">{hospital.phone.emergency}</span>
+            <span className="tabular text-white">{hospital.phone.emergency}</span>
           </a>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function SiteHeader() {
         className={cn(
           "sticky top-0 z-40 transition-[background-color,border-color,box-shadow] duration-500 ease-out",
           scrolled
-            ? "border-b border-brand-line/70 bg-ground shadow-card lg:bg-ground/85 lg:backdrop-blur-md"
+            ? "border-b border-brand-line/70 bg-ground shadow-card lg:bg-ground/95"
             : "border-b border-transparent bg-transparent",
         )}
       >

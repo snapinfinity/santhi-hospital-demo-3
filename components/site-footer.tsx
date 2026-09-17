@@ -18,8 +18,7 @@ export function SiteFooter() {
 
       <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-10 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
-          {/* The logo sits outside the reveal: a transformed wrapper would isolate
-              its multiply blend and leave the asset's white ground showing. */}
+          {/* The logo stays outside the reveal so the lockup is there on first paint. */}
           <div className="flex flex-col gap-5">
             <Logo />
             <Reveal className="flex flex-col gap-5 items-start" direction="up">

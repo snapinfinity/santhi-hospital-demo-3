@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "emergency";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "emergency" | "mint" | "glass";
 export type ButtonSize = "md" | "lg";
 
 /**
@@ -21,6 +21,9 @@ const variants: Record<ButtonVariant, string> = {
   secondary: "border border-brand-line bg-white text-brand hover:border-brand hover:bg-brand-tint",
   ghost: "text-brand hover:bg-brand-tint",
   emergency: "bg-accent text-white hover:bg-accent-ink",
+  /* The two below are for dark, photographic grounds — the hero. */
+  mint: "bg-teal text-navy-deep hover:bg-teal-bright hover:shadow-lift",
+  glass: "border border-white/35 bg-white/10 text-white hover:border-white/70 hover:bg-white/15",
 };
 
 const sizes: Record<ButtonSize, string> = {

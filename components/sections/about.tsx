@@ -28,22 +28,31 @@ export function About() {
           />
         </Reveal>
 
-        {/* Stats band — each cell arrives a beat after the one before it. */}
-        <dl className="mt-10 grid grid-cols-2 border-y border-brand-line sm:grid-cols-3 lg:grid-cols-5">
+        {/*
+          Stats band — each cell arrives a beat after the one before it. Six
+          figures tile every layout without an orphan: two up on a phone, three
+          up on a tablet, one row of six from `lg`. The hairlines follow the
+          same steps — a left rule on every cell that is not first in its row,
+          a top rule on every row but the first.
+        */}
+        <dl className="mt-10 grid grid-cols-2 border-y border-brand-line sm:grid-cols-3 lg:grid-cols-6">
           {stats.map((stat, index) => (
             <Reveal
               key={stat.label}
               index={index}
               direction="up"
               className={cn(
-                "group flex flex-col gap-1 px-5 py-7 transition-colors duration-300 hover:bg-brand-wash",
-                index % 2 === 1 && "border-l border-brand-line",
-                index > 1 && "border-t border-brand-line sm:border-t-0",
-                index > 0 && "lg:border-l",
-                index === 2 && "sm:border-l",
+                "group flex flex-col gap-1 border-brand-line px-4 py-7 transition-colors duration-300 hover:bg-brand-wash sm:px-5 lg:px-4 xl:px-5",
+                index % 2 === 1 && "border-l",
+                index > 1 && "border-t",
+                index % 3 === 0 ? "sm:border-l-0" : "sm:border-l",
+                index > 2 ? "sm:border-t" : "sm:border-t-0",
+                index > 0 ? "lg:border-l" : "lg:border-l-0",
+                "lg:border-t-0",
               )}
             >
-              <dd className="font-display text-4xl font-medium text-brand">
+              {/* Sized so the widest figure, "2,40,000+", clears its cell at every step. */}
+              <dd className="font-display text-[1.75rem] font-medium text-brand sm:text-[2rem] md:text-4xl lg:text-[1.75rem] xl:text-[2rem] 2xl:text-4xl">
                 <StatFigure value={stat.value} />
               </dd>
               <dt className="label-sm text-ink">{stat.label}</dt>
@@ -61,15 +70,15 @@ export function About() {
                 className="arch-sm aspect-[4/5] bg-brand-tint shadow-card"
               >
                 <Image
-                  src="/images/scenes/clinic-checkup.jpg"
-                  alt="A consultant examining a patient in a bright Santhi Hospital clinic room. Demonstration photograph."
+                  src="/images/santhi/dialysis-care.jpg"
+                  alt="A nurse checking on a patient during a session in the Santhi Hospital dialysis unit."
                   fill
                   sizes="(min-width: 1024px) 32vw, 92vw"
                   className="object-cover"
                 />
               </ParallaxFrame>
               <p className="mt-4 text-[0.85rem] text-muted">
-                Outpatient block, first floor — clinics run Mon–Sat, 8 AM to 8 PM.
+                The dialysis unit — one of 32 departments under the same roof.
               </p>
             </div>
           </Reveal>

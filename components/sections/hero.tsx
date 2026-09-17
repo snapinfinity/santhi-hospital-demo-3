@@ -2,8 +2,7 @@ import Image from "next/image";
 import { ArrowRight, MapPin, Phone, Star } from "lucide-react";
 import { BookButton } from "@/components/appointment/book-button";
 import { Marquee } from "@/components/ui/marquee";
-import { ParallaxFrame } from "@/components/ui/parallax";
-import { RibbonArc, RibbonDefs } from "@/components/ui/ribbon";
+import { RibbonDefs } from "@/components/ui/ribbon";
 import { buttonStyles } from "@/components/ui/button";
 import { hospital, tickerItems } from "@/data/site";
 import { doctors } from "@/data/doctors";
@@ -15,58 +14,96 @@ const trustPortraits = doctors.slice(0, 3);
 /** Entrance delays for the copy column, in the order the eye reads them. */
 const rise = (delay: number) => ({ animationDelay: `${delay}s` });
 
+/**
+ * A full-bleed photograph of the hospital's own campus — the main gate and
+ * the mobile ICU under a Kerala sky — with the copy set directly on it.
+ *
+ * Legibility comes from two scrims rather than one flat tint: a horizontal
+ * sweep that is near-solid navy behind the copy and thins to almost nothing
+ * over the building, and a vertical fade along the foot that carries the
+ * cards and the ticker. Below `lg` the copy spans the full width, so the
+ * horizontal sweep stays heavier all the way across.
+ */
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-ground">
+    <section
+      id="top"
+      className="relative isolate overflow-hidden bg-navy-deep text-white"
+    >
       {/* The ribbon gradient is declared once per document, here. */}
       <RibbonDefs />
 
-      {/* Ambient washes — two drift paths, so they never move in step. */}
-      <div
-        aria-hidden="true"
-        className="drift-a pointer-events-none absolute -top-40 right-[-10%] size-[36rem] rounded-full bg-brand-soft/25 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="drift-b pointer-events-none absolute bottom-16 left-[-8%] size-[26rem] rounded-full bg-teal/20 blur-3xl"
-      />
-      <RibbonArc
-        className="drift-b absolute top-24 right-0 hidden h-[26rem] w-[42rem] opacity-[0.07] lg:block"
-        strokeWidth={34}
-      />
+      {/*
+        Photograph — settles in on load, then drifts for as long as it is on
+        screen. Below `lg` the copy runs longer than the viewport, so the
+        picture is a band across the top of the section that dissolves into
+        the navy ground rather than a full-height fill that would need to be
+        darkened into invisibility; from `lg` it fills the section.
+      */}
+      <div className="settle absolute inset-x-0 top-0 h-[72svh] max-h-[40rem] overflow-hidden lg:inset-0 lg:h-auto lg:max-h-none">
+        <Image
+          src="/images/santhi/campus-gate.jpg"
+          alt="The Santhi Hospital campus in Kozhikode: the main gate, the mobile ICU ambulance and the hospital building under a Kerala sky."
+          fill
+          priority
+          sizes="100vw"
+          className="ken-burns object-cover object-[62%_center] lg:object-[70%_center]"
+        />
 
-      <div className="relative mx-auto grid max-w-7xl gap-14 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-10 lg:pt-20 lg:pb-24">
-        {/* Copy */}
-        <div className="lg:col-span-7">
+        {/* Scrim below `lg` — heaviest under the headline, solid by the foot of the band. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-linear-to-b from-navy-deep/80 via-navy/62 via-45% to-navy-deep lg:hidden"
+        />
+        {/* Scrims from `lg` — a sweep behind the copy, and a fade along the foot. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 hidden bg-linear-to-r from-navy-deep/90 via-navy/55 via-40% to-navy/5 lg:block"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 hidden h-1/2 bg-linear-to-t from-navy-deep/90 via-navy-deep/30 to-transparent lg:block"
+        />
+      </div>
+
+      <div className="relative mx-auto flex min-h-[min(88svh,50rem)] max-w-7xl flex-col justify-center px-4 pt-16 pb-14 sm:px-6 lg:min-h-[min(86svh,54rem)] lg:pt-20 lg:pb-32">
+        {/* Copy — on the dark ground the focus ring inverts to white. */}
+        <div className="max-w-2xl [&_:focus-visible]:outline-white">
           <p
-            className="rise inline-flex items-center gap-2 rounded-full border border-brand-line bg-white/80 px-4 py-2 text-[0.85rem] font-medium text-ink-soft"
+            className="rise inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[0.85rem] font-medium text-white/90"
             style={rise(0.05)}
           >
-            <MapPin aria-hidden="true" className="size-4 text-teal-ink" />
+            <MapPin aria-hidden="true" className="size-4 text-teal" />
             Kozhikode, Kerala
-            <span aria-hidden="true" className="text-brand-line">·</span>
+            <span aria-hidden="true" className="text-white/40">·</span>
             Caring since 1992
           </p>
 
-          <h1 className="rise mt-6 max-w-[13ch] font-display text-display text-ink" style={rise(0.14)}>
+          <h1
+            className="rise mt-6 max-w-[13ch] font-display text-display text-white drop-shadow-[0_2px_18px_rgb(22_40_74/0.45)]"
+            style={rise(0.14)}
+          >
             Good medicine begins with{" "}
-            <em className="font-semibold text-brand not-italic">listening</em>.
+            <em className="font-semibold text-teal not-italic">listening</em>.
           </h1>
 
-          <p className="rise mt-6 max-w-[54ch] text-lede text-muted" style={rise(0.24)}>
+          <p
+            className="rise mt-6 max-w-[52ch] text-lede text-white/88 [text-shadow:0_1px_14px_rgb(22_40_74/0.6)]"
+            style={rise(0.24)}
+          >
             120 consultants, 32 departments and 24-hour emergency care under one roof on the
             Malabar coast — so the distance between a worry and an answer is a single visit.
           </p>
 
           <div className="rise mt-8 flex flex-wrap items-center gap-3" style={rise(0.34)}>
-            <BookButton size="lg" className="group">
+            <BookButton variant="mint" size="lg" className="group">
               Book an appointment
               <ArrowRight
                 aria-hidden="true"
                 className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1"
               />
             </BookButton>
-            <a href="#doctors" className={buttonStyles("ghost", "lg")}>
+            <a href="#doctors" className={buttonStyles("glass", "lg")}>
               Find a doctor
             </a>
           </div>
@@ -77,7 +114,7 @@ export function Hero() {
                 <span
                   key={doctor.id}
                   style={{ transitionDelay: `${index * 40}ms` }}
-                  className="relative size-11 overflow-hidden rounded-full ring-2 ring-ground transition-transform duration-500 ease-out group-hover:-translate-y-1"
+                  className="relative size-11 overflow-hidden rounded-full ring-2 ring-white/40 transition-transform duration-500 ease-out group-hover:-translate-y-1"
                 >
                   <Image src={doctor.portrait} alt="" fill sizes="44px" className="object-cover" />
                 </span>
@@ -88,52 +125,27 @@ export function Hero() {
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Star key={index} aria-hidden="true" className="size-4 fill-teal text-teal" />
                 ))}
-                <span className="tabular ml-1 text-sm font-semibold text-ink">4.8</span>
+                <span className="tabular ml-1 text-sm font-semibold text-white">4.8</span>
               </span>
-              <span className="text-sm text-muted">from 4,900+ patient reviews this year</span>
+              <span className="text-sm text-white/70">from 4,900+ patient reviews this year</span>
             </span>
           </div>
         </div>
 
         {/*
-          Photograph with floating cards.
-
-          The scene is a landscape two-shot, so the frame is square rather than a
-          tall arch: a square crop of a 16:9 source keeps both people whole with
-          their faces in the upper third. The arch motif is carried in one deep
-          top-right corner, which also crops the wall notice out of the picture;
-          the emergency card covers what remains of it, and the appointment card
-          sits over the quiet lower-left corner of the doctor's coat.
+          Quick cards. Below `lg` they follow the copy as a two-up row; on
+          desktop they sit over the quiet stretch of road in the bottom-right
+          corner of the photograph, clear of the gate and the ambulance.
         */}
-        <div className="relative lg:col-span-5">
-          {/* Offset plate — a soft tinted echo of the frame behind the photo. */}
-          <div
-            aria-hidden="true"
-            className="petal absolute inset-0 translate-x-4 translate-y-4 bg-teal-tint sm:translate-x-5 sm:translate-y-5"
-          />
-          {/* The portrait settles in on load, then pans gently against the scroll. */}
-          <ParallaxFrame
-            amount={5}
-            className="settle petal relative aspect-[4/5] bg-brand-tint shadow-lift sm:aspect-[3/2] lg:aspect-square"
-          >
-            <Image
-              src="/images/scenes/hero-consultation.jpg"
-              alt="A Santhi Hospital consultant sitting with an elderly patient during a consultation. Demonstration photograph."
-              fill
-              priority
-              sizes="(min-width: 1024px) 40vw, 92vw"
-              className="ken-burns object-cover object-[45%_center]"
-            />
-          </ParallaxFrame>
-
-          {/* Emergency card — over the top-right corner */}
-          <div className="rise absolute -top-4 right-2 sm:-top-5 sm:-right-4" style={rise(0.6)}>
+        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:absolute lg:right-6 lg:bottom-12 lg:mt-0 lg:w-[21rem] lg:grid-cols-1">
+          {/* Emergency card */}
+          <div className="rise" style={rise(0.6)}>
             <a
               href={hospital.phone.emergencyHref}
-              className="float-soft group/call flex items-center gap-3 rounded-2xl border border-accent-line bg-white px-4 py-3 shadow-lift sm:p-3 sm:pr-5"
+              className="float-soft group/call flex h-full items-center gap-3 rounded-2xl border border-white/60 bg-white p-3 pr-5 shadow-lift"
               style={{ animationDelay: "1.4s" }}
             >
-              <span className="hidden size-10 shrink-0 place-items-center rounded-full bg-accent-wash text-accent-ink sm:grid">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-wash text-accent-ink">
                 <Phone aria-hidden="true" className="size-4" />
               </span>
               <span>
@@ -148,9 +160,9 @@ export function Hero() {
             </a>
           </div>
 
-          {/* Next-available card — over the bottom-left corner */}
-          <div className="rise absolute -bottom-10 left-2 sm:-bottom-8 sm:-left-6" style={rise(0.5)}>
-            <div className="float-soft w-[16rem] rounded-2xl border border-brand-line bg-white/95 p-3.5 shadow-lift backdrop-blur sm:w-[17.5rem] sm:p-4">
+          {/* Next-available card */}
+          <div className="rise" style={rise(0.5)}>
+            <div className="float-soft h-full rounded-2xl border border-white/60 bg-white p-3.5 shadow-lift sm:p-4">
               <div className="flex items-center gap-3">
                 <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-brand-tint">
                   <Image src={featured.portrait} alt="" fill sizes="44px" className="object-cover object-top" />
@@ -189,7 +201,7 @@ export function Hero() {
       </div>
 
       {/* Brand ticker */}
-      <div className="relative border-y border-brand-ink/30 bg-brand py-3.5 text-white">
+      <div className="relative border-y border-brand-ink/40 bg-brand py-3.5 text-white">
         <Marquee items={tickerItems} />
       </div>
     </section>

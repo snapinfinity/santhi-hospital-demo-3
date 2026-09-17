@@ -137,7 +137,7 @@ export function AppointmentDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/45 backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/50" />
         <Dialog.Content
           key={session}
           className="fixed inset-0 z-60 flex items-end justify-center sm:items-center sm:p-6"

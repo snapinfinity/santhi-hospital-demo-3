@@ -1,27 +1,33 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Santhi Hospital — "Soft Teal" design system.
+   Santhi Hospital — "Teal & Navy" design system.
 
-   The palette is drawn from the light end of the hospital's campaign artwork:
-   the pale mint and aqua tints, the warm white card, the single teal the
-   headline is set in. The deep navy-teal of the poster ground is deliberately
-   absent — it survives only as the ink colour used for type, never as a
-   surface. Contrast rules:
-   - #14717c is the working teal: 5.7:1 on white, safe for body copy.
-   - #16786a is the mint-side text colour: 5.3:1 on white.
-   - #3fae97 and #9fced3 are decorative only and never carry text.
+   The palette follows the colours the hospital already uses on
+   santhihospital.com: a bright turquoise-green (#1cba9f) for icons, rules and
+   highlights, and a deep navy (#223a66) for headings and dark surfaces, on a
+   cool white ground (#f7f9fb). Contrast rules:
+   - #0b7d6a is the working teal: 5.1:1 on white, safe for body copy and for
+     white text on a button. It is the hospital's turquoise, darkened until it
+     clears AA — the bright #1cba9f itself only reaches 2.5:1 on white.
+   - #1cba9f is decorative on light grounds (icons, dots, rules) and carries
+     text only on navy, where it reaches 4.6:1.
+   - #0a7562 is the label colour: 5.6:1 on white.
    - #e0353c is limited to emergency indicators.
    --------------------------------------------------------------------------- */
 
 @theme {
-  /* Primary — teal */
-  --color-brand: #14717c;
-  --color-brand-ink: #0d5a64;
-  --color-brand-tint: #d5e9ea;
-  --color-brand-wash: #eaf4f4;
-  --color-brand-line: #cbe2e4;
-  --color-brand-soft: #9fced3;
+  /* Primary — the hospital's teal, at text strength */
+  --color-brand: #0b7d6a;
+  --color-brand-ink: #086b5a;
+  --color-brand-tint: #d3f1ea;
+  --color-brand-wash: #ecf8f5;
+  --color-brand-line: #c5e8df;
+  --color-brand-soft: #8fdccb;
+
+  /* Secondary — the hospital's navy. Headings, and the only dark ground. */
+  --color-navy: #223a66;
+  --color-navy-deep: #16284a;
 
   /* Accent — emergency only */
   --color-accent: #e0353c;
@@ -29,27 +35,28 @@
   --color-accent-wash: #fdeeee;
   --color-accent-line: #f4d3d4;
 
-  /* Mint — the green end of the campaign sweep */
-  --color-teal: #3fae97;
-  --color-teal-tint: #e3f4ef;
-  --color-teal-ink: #16786a;
+  /* Teal — the hospital's bright turquoise, as it appears on their site */
+  --color-teal: #1cba9f;
+  --color-teal-bright: #3bcfb4;
+  --color-teal-tint: #dcf5ee;
+  --color-teal-ink: #0a7562;
 
-  /* Ink — deep teal-slate. Type and hairlines only, never a ground. */
-  --color-ink: #123239;
-  --color-ink-soft: #37585f;
+  /* Ink — navy for type and hairlines */
+  --color-ink: #223a66;
+  --color-ink-soft: #3b4d75;
 
-  /* Grounds — pale, luminous, faintly cool */
-  --color-ground: #f5f9f9;
-  --color-ground-deep: #e2eff0;
-  --color-paper: #fbfaf6;
-  --color-paper-line: #e6edec;
-  --color-muted: #566e73;
+  /* Grounds — cool white, the same tone as the hospital's own pages */
+  --color-ground: #f7f9fb;
+  --color-ground-deep: #eaf0f6;
+  --color-paper: #fbfcfe;
+  --color-paper-line: #e4eaf1;
+  --color-muted: #5a6a85;
 
-  /* Ribbon — the campaign's teal-to-mint sweep */
-  --color-ribbon-1: #0f6f79;
-  --color-ribbon-2: #157f84;
-  --color-ribbon-3: #23988c;
-  --color-ribbon-4: #3fae97;
+  /* Ribbon — the navy-to-teal sweep */
+  --color-ribbon-1: #223a66;
+  --color-ribbon-2: #1e5d80;
+  --color-ribbon-3: #16938f;
+  --color-ribbon-4: #1cba9f;
 
   /* Type */
   --font-display: var(--font-outfit), "Avenir Next", "Segoe UI", sans-serif;
@@ -78,8 +85,8 @@
   --text-mega--letter-spacing: -0.045em;
 
   /* Depth. Two levels only — a resting edge and a lifted state. */
-  --shadow-card: 0 1px 2px rgb(18 50 57 / 0.04), 0 10px 28px -14px rgb(18 50 57 / 0.16);
-  --shadow-lift: 0 2px 6px rgb(18 50 57 / 0.05), 0 22px 46px -18px rgb(20 113 124 / 0.28);
+  --shadow-card: 0 1px 2px rgb(34 58 102 / 0.04), 0 10px 28px -14px rgb(34 58 102 / 0.16);
+  --shadow-lift: 0 2px 6px rgb(34 58 102 / 0.05), 0 22px 46px -18px rgb(11 125 106 / 0.28);
 
   /* Motion — one easing pair for the whole site. */
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -144,7 +151,7 @@
   }
 }
 
-/** The campaign's teal-to-mint sweep, used for rules and the progress bar. */
+/** The navy-to-teal sweep, used for rules and the progress bar. */
 @utility ribbon-sweep {
   background-image: linear-gradient(
     100deg,
@@ -159,10 +166,10 @@
 @utility wash-sweep {
   background-image: linear-gradient(
     105deg,
-    #d9edec 0%,
-    #cfe6ea 38%,
-    #d1eae0 68%,
-    #ddf2e8 100%
+    #e3ebf5 0%,
+    #dbeef3 38%,
+    #d9f3ec 68%,
+    #dcf6ee 100%
   );
 }
 
@@ -269,6 +276,7 @@
 
 @utility marquee-track {
   animation: marquee 44s linear infinite;
+  will-change: transform;
 }
 
 /**
@@ -304,52 +312,94 @@
 
 @utility float-soft {
   animation: float-soft 8s ease-in-out infinite;
+  will-change: transform;
 }
 
-/** Ambient wash drift — two paths, so neighbouring shapes never move in step. */
+/**
+ * Ambient washes. These are radial gradients, not blurred elements: a blur
+ * filter on a 600px shape has to be re-rasterised whenever the shape changes,
+ * and a gradient costs nothing. They are promoted to their own layer once and
+ * then only ever translated — never scaled — so the loop is a texture move.
+ */
+@utility wash-brand {
+  background-image: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-brand-soft) 30%, transparent),
+    transparent 74%
+  );
+}
+
+@utility wash-mint {
+  background-image: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-teal) 24%, transparent),
+    transparent 74%
+  );
+}
+
+@utility wash-white {
+  background-image: radial-gradient(closest-side, rgb(255 255 255 / 0.65), transparent 74%);
+}
+
+/** Two drift paths, so neighbouring shapes never move in step. */
 @keyframes drift-a {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate3d(20px, -26px, 0) scale(1.06);
+    transform: translate3d(20px, -26px, 0);
   }
 }
 
 @keyframes drift-b {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate3d(-22px, 18px, 0) scale(0.95);
+    transform: translate3d(-22px, 18px, 0);
   }
 }
 
 @utility drift-a {
   animation: drift-a 24s ease-in-out infinite;
+  will-change: transform;
 }
 
 @utility drift-b {
   animation: drift-b 30s ease-in-out infinite;
+  will-change: transform;
 }
 
-/** Expanding ring for the live emergency dot. */
+/**
+ * Expanding ring for the live emergency dot. The ring is a pseudo-element
+ * scaling up and fading — both composited — rather than an animated
+ * box-shadow, which would repaint on every frame.
+ */
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgb(224 53 60 / 0.45);
+    transform: scale(1);
+    opacity: 0.45;
   }
-  70% {
-    box-shadow: 0 0 0 9px rgb(224 53 60 / 0);
-  }
+  70%,
   100% {
-    box-shadow: 0 0 0 0 rgb(224 53 60 / 0);
+    transform: scale(3.4);
+    opacity: 0;
   }
 }
 
 @utility pulse-dot {
-  animation: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background-color: var(--color-accent);
+    pointer-events: none;
+    animation: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 }
 
 /**
@@ -431,7 +481,7 @@
   .ken-burns,
   .drift-a,
   .drift-b,
-  .pulse-dot,
+  .pulse-dot::after,
   [data-slot="accordion-content"] {
     animation: none !important;
   }

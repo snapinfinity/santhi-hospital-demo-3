@@ -48,7 +48,8 @@ export type Stat = { value: string; label: string; detail: string };
 
 export const stats: Stat[] = [
   { value: "34", label: "Years of care", detail: "Caring for Kozhikode and the Malabar coast since 1992." },
-  { value: "120+", label: "Specialists", detail: "Consultants across 32 clinical departments." },
+  { value: "120+", label: "Specialists", detail: "Consultants across every clinical department." },
+  { value: "32", label: "Departments", detail: "Every speciality under one roof, sharing one patient record." },
   { value: "2,40,000+", label: "Patient visits a year", detail: "Outpatient and inpatient episodes across our clinics." },
   { value: "98%", label: "Would recommend us", detail: "From 5,200 discharge surveys in the last year." },
   { value: "24/7", label: "Emergency cover", detail: "Consultant-led trauma and critical care, always staffed." },
