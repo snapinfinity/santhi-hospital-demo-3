@@ -67,19 +67,26 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Main navigation — transparent over the hero, frosted after scroll. */}
+      {/*
+        Main navigation — transparent over the hero, frosted after scroll.
+
+        On small screens the bar is a fixed height and goes fully opaque when
+        stuck: the desktop shrink and the translucent frost both read as the
+        top of the bar being cut off on a phone, where the browser chrome is
+        already moving. The compact treatment is reserved for `lg` and up.
+      */}
       <header
         className={cn(
           "sticky top-0 z-40 transition-[background-color,border-color,box-shadow] duration-500 ease-out",
           scrolled
-            ? "border-b border-brand-line/70 bg-ground/85 shadow-card backdrop-blur-md"
+            ? "border-b border-brand-line/70 bg-ground shadow-card lg:bg-ground/85 lg:backdrop-blur-md"
             : "border-b border-transparent bg-transparent",
         )}
       >
         <div
           className={cn(
-            "mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 transition-[height] duration-500 ease-out sm:px-6",
-            scrolled ? "h-16" : "h-18",
+            "mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 transition-[height] duration-500 ease-out sm:px-6",
+            scrolled ? "lg:h-16" : "lg:h-18",
           )}
         >
           <a href="#top" aria-label="Santhi Hospital, Kozhikode — back to top">

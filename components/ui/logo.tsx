@@ -17,8 +17,9 @@ export function Logo({ className, compact = false }: { className?: string; compa
         height={242}
         priority
         className={cn(
-          "w-auto mix-blend-multiply transition-[height] duration-500 ease-out",
-          compact ? "h-10 sm:h-11" : "h-12 sm:h-14",
+          // A constant size below `lg`; the compact step only plays on desktop.
+          "h-10 w-auto mix-blend-multiply transition-[height] duration-500 ease-out sm:h-11",
+          !compact && "lg:h-14",
         )}
       />
       <span

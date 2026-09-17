@@ -186,14 +186,22 @@
 }
 
 /** Arch-topped frames — the Kerala motif that carries the whole identity. */
-@utility arch {
-  border-start-start-radius: 999px;
-  border-start-end-radius: 999px;
-}
-
 @utility arch-sm {
   border-start-start-radius: 3rem;
   border-start-end-radius: 3rem;
+}
+
+/**
+ * The arch carried on one corner only. A landscape photograph loses heads to
+ * a full arch, so the hero frame keeps three soft corners and sweeps the
+ * fourth — the crop stays clear of the faces and the shape stays in the family.
+ */
+@utility petal {
+  border-radius: 1.75rem;
+  border-start-end-radius: 6rem;
+  @media (width >= 1024px) {
+    border-start-end-radius: 8rem;
+  }
 }
 
 /** Horizontal rails: hide the scrollbar, keep keyboard and touch scrolling. */
@@ -261,6 +269,26 @@
 
 @utility marquee-track {
   animation: marquee 44s linear infinite;
+}
+
+/**
+ * A slow drift for the hero photograph — a few percent of scale and a short
+ * pan, out and back over half a minute, so the picture is never quite still.
+ * The image only grows, so the frame edge is never exposed.
+ */
+@keyframes ken-burns {
+  0%,
+  100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.07) translate3d(-1.2%, -1%, 0);
+  }
+}
+
+@utility ken-burns {
+  animation: ken-burns 28s ease-in-out infinite;
+  will-change: transform;
 }
 
 /** Gentle floating for the hero's badge cards. */
@@ -400,6 +428,7 @@
   .settle,
   .marquee-track,
   .float-soft,
+  .ken-burns,
   .drift-a,
   .drift-b,
   .pulse-dot,

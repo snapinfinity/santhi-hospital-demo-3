@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArrowRight, MapPin, Star } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Star } from "lucide-react";
 import { BookButton } from "@/components/appointment/book-button";
 import { Marquee } from "@/components/ui/marquee";
 import { ParallaxFrame } from "@/components/ui/parallax";
@@ -95,61 +95,94 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Arch portrait with floating cards */}
+        {/*
+          Photograph with floating cards.
+
+          The scene is a landscape two-shot, so the frame is square rather than a
+          tall arch: a square crop of a 16:9 source keeps both people whole with
+          their faces in the upper third. The arch motif is carried in one deep
+          top-right corner, which also crops the wall notice out of the picture;
+          the emergency card covers what remains of it, and the appointment card
+          sits over the quiet lower-left corner of the doctor's coat.
+        */}
         <div className="relative lg:col-span-5">
-          <div className="relative">
-            <div
-              aria-hidden="true"
-              className="arch absolute inset-0 translate-x-4 translate-y-4 border-2 border-teal/45"
-            />
-            {/* The portrait settles in on load, then pans gently against the scroll. */}
-            <ParallaxFrame
-              amount={6}
-              className="settle arch relative aspect-[4/5] bg-brand-tint shadow-lift"
-            >
-              <Image
-                src="/images/scenes/hero-consultation.jpg"
-                alt="A Santhi Hospital consultant sitting with an elderly patient during a consultation. Demonstration photograph."
-                fill
-                priority
-                sizes="(min-width: 1024px) 40vw, 92vw"
-                className="object-cover"
-              />
-            </ParallaxFrame>
-          </div>
-
-          {/* Next-available card */}
+          {/* Offset plate — a soft tinted echo of the frame behind the photo. */}
           <div
-            className="rise absolute -bottom-6 left-4 max-w-[17rem] sm:left-0"
-            style={rise(0.55)}
+            aria-hidden="true"
+            className="petal absolute inset-0 translate-x-4 translate-y-4 bg-teal-tint sm:translate-x-5 sm:translate-y-5"
+          />
+          {/* The portrait settles in on load, then pans gently against the scroll. */}
+          <ParallaxFrame
+            amount={5}
+            className="settle petal relative aspect-[4/5] bg-brand-tint shadow-lift sm:aspect-[3/2] lg:aspect-square"
           >
-            <div className="float-soft rounded-2xl border border-brand-line bg-white/95 p-4 shadow-lift backdrop-blur">
-              <p className="label-sm text-muted">Next available</p>
-              <p className="mt-1 text-[0.9375rem] font-semibold text-ink">{featured.name}</p>
-              <p className="text-xs text-muted">{featured.role.split("—")[1]?.trim() ?? featured.role}</p>
-              <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-teal-tint px-3 py-1 text-xs font-medium text-teal-ink">
-                <span aria-hidden="true" className="size-1.5 rounded-full bg-teal" />
-                {featured.nextAvailable}
-              </p>
-            </div>
-          </div>
+            <Image
+              src="/images/scenes/hero-consultation.jpg"
+              alt="A Santhi Hospital consultant sitting with an elderly patient during a consultation. Demonstration photograph."
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 92vw"
+              className="ken-burns object-cover object-[45%_center]"
+            />
+          </ParallaxFrame>
 
-          {/* Emergency card */}
-          <div className="rise absolute top-6 right-4 sm:right-0" style={rise(0.7)}>
-            <div
-              className="float-soft rounded-2xl border border-accent-line bg-white p-4 shadow-lift"
+          {/* Emergency card — over the top-right corner */}
+          <div className="rise absolute -top-4 right-2 sm:-top-5 sm:-right-4" style={rise(0.6)}>
+            <a
+              href={hospital.phone.emergencyHref}
+              className="float-soft group/call flex items-center gap-3 rounded-2xl border border-accent-line bg-white px-4 py-3 shadow-lift sm:p-3 sm:pr-5"
               style={{ animationDelay: "1.4s" }}
             >
-              <p className="label-sm flex items-center gap-2 text-muted">
-                <span aria-hidden="true" className="pulse-dot size-2 rounded-full bg-accent" />
-                24/7 Emergency
-              </p>
-              <a
-                href={hospital.phone.emergencyHref}
-                className="tabular mt-1 block font-display text-lg font-medium text-accent-ink underline-offset-4 hover:underline"
-              >
-                {hospital.phone.emergency}
-              </a>
+              <span className="hidden size-10 shrink-0 place-items-center rounded-full bg-accent-wash text-accent-ink sm:grid">
+                <Phone aria-hidden="true" className="size-4" />
+              </span>
+              <span>
+                <span className="label-sm flex items-center gap-2 text-muted">
+                  <span aria-hidden="true" className="pulse-dot size-2 rounded-full bg-accent" />
+                  24/7 Emergency
+                </span>
+                <span className="tabular block font-display text-lg leading-tight font-medium text-accent-ink underline-offset-4 group-hover/call:underline">
+                  {hospital.phone.emergency}
+                </span>
+              </span>
+            </a>
+          </div>
+
+          {/* Next-available card — over the bottom-left corner */}
+          <div className="rise absolute -bottom-10 left-2 sm:-bottom-8 sm:-left-6" style={rise(0.5)}>
+            <div className="float-soft w-[16rem] rounded-2xl border border-brand-line bg-white/95 p-3.5 shadow-lift backdrop-blur sm:w-[17.5rem] sm:p-4">
+              <div className="flex items-center gap-3">
+                <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-brand-tint">
+                  <Image src={featured.portrait} alt="" fill sizes="44px" className="object-cover object-top" />
+                </span>
+                <span className="min-w-0">
+                  <span className="label-sm block text-muted">Next available</span>
+                  <span className="block truncate text-[0.9375rem] font-semibold text-ink">
+                    {featured.name}
+                  </span>
+                  <span className="block text-xs text-muted">
+                    {featured.role.split("—")[1]?.trim() ?? featured.role}
+                  </span>
+                </span>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3 border-t border-paper-line pt-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-teal-tint px-3 py-1 text-xs font-medium whitespace-nowrap text-teal-ink">
+                  <span aria-hidden="true" className="size-1.5 rounded-full bg-teal" />
+                  {featured.nextAvailable}
+                </span>
+                <BookButton
+                  doctorId={featured.id}
+                  variant="ghost"
+                  className="group/slot min-h-9 shrink-0 px-3 text-sm"
+                  ariaLabel={`Book with ${featured.name}`}
+                >
+                  Book
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-3.5 transition-transform duration-300 ease-out group-hover/slot:translate-x-1"
+                  />
+                </BookButton>
+              </div>
             </div>
           </div>
         </div>
